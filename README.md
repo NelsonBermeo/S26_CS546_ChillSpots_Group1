@@ -59,7 +59,7 @@ Once all of the project dependencies are set up (and mongodb is running), you ca
 - **APIs:** ?  
 - **Others:** ?
 
-## 👩‍💻 Team GitMatches
+## 👩‍💻 Team ChillSpots
 
 - Christopher Bernard
 - Jamil Torres
