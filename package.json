@@ -1,0 +1,17 @@
+{
+	"name": "CS546 Chill Spots",
+	"version": "1.0.0",
+	"description": "...",
+	"main": "app.js",
+	"type": "module",
+	"scripts": {
+		"seed": "node ./tasks/seed.js",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node app.js"
+	},
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"mongodb": "^6.1.0"
+	}
+}
