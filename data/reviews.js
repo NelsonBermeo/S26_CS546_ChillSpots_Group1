@@ -15,7 +15,7 @@ const addReview = async (
     safteyRating,
     // comments
 ) => {
-    checkId(userId) // Must exist, be a string, be a ObjectId, must belong to a real user 
+    userId = checkId(userId) // Must exist, be a string, be a ObjectId, must belong to a real user 
     const userCollection = await users()
     let userIdCheck = await userCollection.findOne({ id : userId })
     if (!userIdCheck){
