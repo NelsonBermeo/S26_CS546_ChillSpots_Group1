@@ -97,7 +97,31 @@ const addUser = async (
     // Age should be a number, at least 13 and at most 120, 
 
 
-    if 
-    // profile picture is optional
+    if (profile_picture === undefined || profile_picture === null || profile_picture.trim() === "" ){
+        profile_picture = DEFAULT_PROFILE_PICTURE
+    } else {
+        profile_picture = profile_picture.trim()
+    }
+    // profile picture is optional; maybe I should check if they uploaded a valid path
 
+    const newUser = {
+        "first_name" : first_name, 
+        "last_name" : last_name,
+        "username" : usernameInput,
+        "email" : emailInput,
+        "password" : hashed_password,
+        "reviews" : [], 
+        "friends_list" : [],
+        "visited_locations_list" : [],
+        "public_lists" : [],
+        "profile_picture" : profile_picture, 
+        "achievements" : [],
+        "added_locations_list" : [],
+        "age" : age,
+        "role" : "user"
+    }
+
+    const insertInfo = await userCollection.insertOne(newUser)
+    if (!insertInfo.insertedId || !insertInfo.acknowledged ) throw "Error: Insert Failed"
+    return insertInfo.insertedId
 }
