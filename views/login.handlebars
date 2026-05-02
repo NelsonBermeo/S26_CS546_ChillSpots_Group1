@@ -1,0 +1,28 @@
+{{!
+    Handlebars Variables:
+        errors: array for errors that occur during login
+}}
+<ul class="errorList" id="errors">
+  {{#if errors}}
+    {{#each errors}}
+      <li>{{this}}</li>
+    {{/each}}
+  {{/if}}
+</ul>
+
+<form id="signin-form" name="signin-form" method="POST">
+  <label for="email">Email: </label>
+  <input type="text" id="email" name="email" />
+  <br />
+
+  <label for="password">Password: </label>
+  <input type="password" id="password" name="password" />
+  <br />
+
+  <input
+    type="submit"
+    id="submit_button"
+    name="submit_button"
+    value="Sign In"
+  />
+</form>
