@@ -19,7 +19,7 @@ const getUserById = async (id) => {
     const user = await userCollection.findOne
 }
 
-const addUser = async (
+export const addUser = async (
     //Things we need to check: 
     // 1) Length of everything 
     first_name,
@@ -38,8 +38,8 @@ const addUser = async (
 ) => {
     first_name = checkString(first_name)
     last_name = checkString(last_name)
-    username = checkString(username)
-    email = checkString(email)
+    // username = checkString(username)
+    // email = checkString(email)
     password = checkString(password)
     // profile_picture = checkString(profile_picture)
     age = checkNumericString(age)
