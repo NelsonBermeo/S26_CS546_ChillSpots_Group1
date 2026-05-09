@@ -6,9 +6,7 @@ const router = Router();
 
 router.route('/').get(async (req, res) => {
     try {
-        if (!req.sesson.member) {
-            res.render('home', {});
-        }
+        res.render('home', {title: "ChillSpots - Home"});
     } catch (e) {
         return res.status(500).json({error : e});
     }
@@ -18,7 +16,7 @@ router
     .route('/register')
     .get(async (req, res) => {
         try {
-           res.render('register');
+            res.render('register');
         } catch (e) {
             return res.status(500).json({error : e});
         }
@@ -187,8 +185,13 @@ router
                 res.redirect("/user")
             }
         } catch (e) {
-
+            res.status(500).render("error", {title: "Error", error: `Internal Server Error Occured: ${e}`})
         }
     })
+
+router.route("/signout").get(async (req, res) => {
+    req.session.destroy();
+    res.render('logout', {title: "ChillSpots - Logout"})
+})
 
 export default router;

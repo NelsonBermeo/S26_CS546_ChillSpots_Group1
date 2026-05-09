@@ -4,7 +4,7 @@ import exphbs from 'express-handlebars';
 
 const app = express();
 import configRoutes from "./routes/index.js";
-import { middleware } from "./middleware.js";
+import { middleware }  from "./middleware/auth.js";
 
 app.engine('handlebars', exphbs.engine());
 app.set('view engine', 'handlebars');
@@ -12,8 +12,9 @@ app.use('/public', express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.user(session({
+app.use(session({
     name: 'ChillAuthState',
+    secret: 'chill string duper secret!!!',
     resave: false,
     saveUninitialized: false
 }))
@@ -22,5 +23,5 @@ configRoutes(app);
 
 app.listen(3000, () => {
     console.log("Server's up!");
-    Console.log("Your routes will be running on https://localhost:3000")
+    console.log("Your routes will be running on http://localhost:3000");
 });

@@ -1,7 +1,7 @@
 // import {users} from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
-import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "./validation.js"
+import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "../validation.js"
 // import validation package or functions
 
 const DEFAULT_PROFILE_PICTURE = "/public/images/default-profile.jpg";
@@ -132,7 +132,7 @@ export const addUser = async (
     return insertInfo.insertedId
 }
 
-export const authenticateMember = async () => {
+export const authenticateMember = async (email, password) => {
     
 }
 

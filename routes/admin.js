@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import xss from 'xss';
 import { validate } from '../validation.js';
+import * as reports from '../data/reports.js'
 
 const router = Router();
 
@@ -18,29 +19,29 @@ const router = Router();
  */
 
 router
-.route('/dashboard')
-.get(async (req, res) => {
-    if (!req.session.member) {
-        res.redirect('/');
-        return;
-    }
-    if (req.session.member.membershipLevel === "member") {
-        res.redirect('/user');
-        return;
-    } else if (req.session.member.membershipLevel === "admin") {
-        try {
-            const reportData = await getAllReports();
-            res.render('admindashboard', {
-                title: "Admin Dashboard",
-                data: reportData
-            })
-        } catch (e) {
-
+    .route('/dashboard')
+    .get(async (req, res) => {
+        if (!req.session.member) {
+            res.redirect('/');
+            return;
         }
-    }
-})
-.post(async (req, res) => {
+        if (req.session.member.membershipLevel === "member") {
+            res.redirect('/user');
+            return;
+        } else if (req.session.member.membershipLevel === "admin") {
+            try {
+                const reportData = await getAllReports();
+                res.render('admindashboard', {
+                    title: "Admin Dashboard",
+                    data: reportData
+                })
+            } catch (e) {
+                res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
+            }
+        } else { res.redirect('/'); return; }
+    })
+    .post(async (req, res) => {
 
-})
+    })
 
 export default router;
