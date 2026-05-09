@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
 import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "./validation.js"
-// import validation package or functions
+import {reviews} from '../config/mongoCollections.js';
 
 const addReview = async (
     userId,
@@ -191,3 +191,5 @@ const removeReview = async (reviewId, userId) => {
     };
 
 }
+
+export {removeReview, updateReview, getAllReviews, getReviewById, addReview}

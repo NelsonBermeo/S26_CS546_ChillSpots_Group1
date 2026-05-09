@@ -1,8 +1,44 @@
-// import {users} from '../config/mongoCollections.js';
+import {users} from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
 import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "../validation.js"
-// import validation package or functions
+/*
+
+The user object schema:
+
+    "_id" : ObjectId
+    "first_name" : first_name, 
+    "last_name" : last_name,
+    "username" : usernameInput,
+    "email" : emailInput,
+    "password" : hashed_password,
+    "reviews" : [], //LIST OF NORMAL ID STRINGS
+    "friends_list" : [],
+    "visited_locations_list" : [],
+    "public_lists" : [],
+    "profile_picture" : profile_picture, 
+    "achievements" : [],
+    "added_locations_list" : [],
+    "age" : age,
+    "role" : "user"
+
+This file includes the following data functions: 
+
+1) addUser(first_name, last_name, usernameInput, emailInput, password, profile_picture, age) - when someone signs up the route should collect form data then call this function. 
+
+2) getUserById(id) - many parts of the project use users. This function is a way to get the full user object given just their user ID. 
+
+3) getUserByEmail(email) - this function is necessary for login. When someone logs in with email we need to return the corresponding user object. 
+
+4) checkUser(email, password) - this function is needed for login authentication. It finds the user by email and compares the submitted password against the hashed password in the database
+
+5) updateUser(id, updates) - this is necessary for profile editing. People can change their first_name, email, etc.
+
+6) removeUser(id) - the question is what happens to a deleted users reviews, locations, comments... here we can define that behavior 
+
+7) getAllUsers - this will return all the users 
+
+*/
 
 const DEFAULT_PROFILE_PICTURE = "/public/images/default-profile.jpg";
 
@@ -10,7 +46,7 @@ const getAllUsers = async () => {
     const userCollection = await users();
     let userList = await userCollection.find({}).toArray(); 
     return userList; 
-    // Will this return a list of jsons? Idk. 
+    // Returns an array of user objects
 } 
 
 const getUserById = async (id) => {
@@ -22,7 +58,7 @@ const getUserById = async (id) => {
     if (!user){
         throw "Error: User not found"
     }
-    return user
+    return user //Returns the user object
 }
 
 export const addUser = async (
@@ -44,8 +80,8 @@ export const addUser = async (
 ) => {
     first_name = checkString(first_name)
     last_name = checkString(last_name)
-    username = checkString(usernameInput)
-    email = checkString(emailInput)
+    usernameInput = checkString(usernameInput)
+    emailInput = checkString(emailInput)
     password = checkString(password)
     // profile_picture = checkString(profile_picture)
     age = checkNumericString(age)
@@ -129,7 +165,7 @@ export const addUser = async (
 
     const insertInfo = await userCollection.insertOne(newUser)
     if (!insertInfo.insertedId || !insertInfo.acknowledged ) throw "Error: Insert Failed"
-    return insertInfo.insertedId
+    return insertInfo.insertedId.toString() //Returns the id of the new added user
 }
 
 export const authenticateMember = async (email, password) => {
@@ -145,6 +181,8 @@ const updateUser = async (
     profile_picture,
     age
 ) => {
+    //A call would look like: testuserupdate = await updateUser(testuser, "", "bernard", "nelsonbernard")
+    
     //For now I'll have update user only be able to update safe things like user information 
     //Like age, username, profile_pic, first last name, email 
     //Maybe password can have it's own function 
@@ -215,9 +253,9 @@ const updateUser = async (
         throw "Could not update user"
     }
 
-    updateInfo._id = updateInfo._id.toString()
+    // updateInfo._id = updateInfo._id.toString() 
 
-    return updateInfo;
+    return updateInfo; //returns the user object 
 
 }
 
@@ -225,3 +263,51 @@ const removeUser = async (id) => {
     id = checkId(id)
     //How should I remove a user? 
 }
+
+const getUserByEmail = async (emailInput) => {
+    emailInput = checkString(emailInput)
+    emailInput = emailInput.toLowerCase()
+    check_length(emailInput, 3, 100)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!(emailRegex.test(emailInput))){
+        throw "Error: Invalid email address"
+    }
+    const userCollection = await users();
+    let emailUser = await userCollection.findOne({ email : emailInput })
+    if (!emailUser){
+        // email is taken
+        throw "Error: Email is invalid"
+    }
+    return emailUser //Returns the user object
+}
+
+const checkUser = async (emailInput, password) => {
+    // Input checking ------------------------------------------------------------------
+    emailInput = checkString(emailInput)
+    password = checkString(password)
+    emailInput = emailInput.toLowerCase()
+    check_length(emailInput, 3, 100)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!(emailRegex.test(emailInput))){
+        throw "Error: Invalid email address"
+    }
+    check_length(password, 8, 64)
+    if (!/[A-Z]/.test(password)) throw "Error: Password must contain at least one uppercase letter" 
+    if (!/[a-z]/.test(password)) throw "Error: Password must contain at least one lowercase letter" 
+    if (!/[0-9]/.test(password)) throw "Error: Password must contain at least one number" 
+    if (!/[^A-Za-z0-9]/.test(password)) throw "Error: Password must contain at least one special character" 
+    // Input checking ------------------------------------------------------------------
+    const userCollection = await users();
+    let emailUser = await userCollection.findOne({ email : emailInput })
+    if (!emailUser){
+        throw "Error: Either the email or password is invalid"
+        //We don't say no account exists with that email because we do not want to reveal whether a email exists in the system 
+    }
+    if (bcrypt.compare(password, emailUser.password) === false){ //We use bcrypt to compare
+        throw "Error: Either the email or password is invalid"
+    }
+    return emailUser //returns the user object 
+
+}
+
+export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers}

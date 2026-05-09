@@ -1,0 +1,18 @@
+<main class="location">
+  <p class="locAddress">{{address}}</p>
+  {{#each images}}
+    <img src="{{link}}" class="locationImage" />
+  {{/each}}
+  <p class="locLikes">{{likes}}</p>
+  <p class="locDislikes">{{dislikes}}</p>
+  <p class="locAvgSafety">{{average_safety_rating}}</p>
+  <input
+    type="submit"
+    value="Post a Review!"
+    onlick="submitreview({{id}})"
+    id="postReviewButton"
+  />
+  {{#each reviews}}
+    {{> review this}}
+  {{/each}}
+</main>
