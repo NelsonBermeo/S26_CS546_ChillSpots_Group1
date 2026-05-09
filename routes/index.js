@@ -14,7 +14,10 @@ const constructorMethod = (app) => {
     app.use('/user', userRoutes);
 
     app.use((req, res) => {
-        res.status(404).render("error", {error: "The page you are looking for cannot be found."})
+        res.status(404).render("error", {
+            title: "Error",
+            error: "The page you are looking for cannot be found."
+        })
     })
 }
 
