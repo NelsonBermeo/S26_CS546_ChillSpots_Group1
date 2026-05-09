@@ -1,14 +1,14 @@
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
-import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "./validation.js"
-import {reviews} from '../config/mongoCollections.js';
+import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "../validation.js"
+import {reviews, users, locations} from '../config/mongoCollections.js';
 
 const addReview = async (
     userId,
     //username, we don't need username if we have the userID already
     location_id,
     content,
-    pictures, //We can add pictures later, let's just get the data functions working
+    // pictures, //We can add pictures later, let's just get the data functions working
     // likes,
     // dislikes,
     // date,
@@ -17,14 +17,14 @@ const addReview = async (
 ) => {
     userId = checkId(userId) // Must exist, be a string, be a ObjectId, must belong to a real user 
     const userCollection = await users()
-    let userIdCheck = await userCollection.findOne({ id : userId })
+    let userIdCheck = await userCollection.findOne({ _id : new ObjectId(userId) })
     if (!userIdCheck){
         throw "Error: User ID does not exist"
     }
 
-    checkId(location_id) //Must exist, be a string, be a ObjectId, must belong to locations collection
+    location_id = checkId(location_id) //Must exist, be a string, be a ObjectId, must belong to locations collection
     const locationCollection = await locations()
-    let locationIdCheck = await userCollection.findOne({ id : location_id })
+    let locationIdCheck = await locationCollection.findOne({ _id : new ObjectId(location_id) })
     if (!locationIdCheck){
         throw "Error: Location ID does not exist"
     }
@@ -33,7 +33,7 @@ const addReview = async (
     check_length(content, 1, 1000)
     //Our content can be 1 - 1000 characters for now and can contain any char
 
-    pictures =  
+    // pictures =  
     // Optional, must be an array, each item must be a non empty string, each item should be a valid URL or image path, max 5 pictues
 
     safteyRating = checkNumericString(safteyRating)
@@ -50,7 +50,7 @@ const addReview = async (
         "likes" : 0,
         "disikes" : 0,
         "date" : new Date(), //instant date
-        "safteyRating" : safteyRating,
+        "safteyRating" : parseSafteyRating,
         "comments" : []
     }
 
@@ -66,22 +66,31 @@ const addReview = async (
     const reviewId = insertInfo.insertedId
     //Then we have to add this review to the user who uploaded it: 
 
-    await userCollection.updateOne( { _id: new ObjectId(userId)}, { $push: {reviews: reviewId }})
+    await userCollection.updateOne( { _id: new ObjectId(userId)}, { $push: {reviews: reviewId.toString() }})
 
     //Then we have to add this review to the location we added it to: 
 
-    await userCollection.updateOne( { _id : new ObjectId( location_id ) }, { $push : { reviews : reviewId } } )
+    await locationCollection.updateOne( { _id : new ObjectId( location_id ) }, { $push : { reviews : reviewId.toString() } } )
+    
+    
+    const reviewsForLocation = await reviewCollection.find({ location_id: new ObjectId( location_id ) }).toArray()
+    let sum = 0
+    for (let review of reviewsForLocation) {
+        sum += review.safteyRating
+    }
+    
+    let average = reviewsForLocation.length === 0 ? 0 : sum / reviewsForLocation.length
 
-    // Then we'd need to update the average rating on the location which we will do soon.
+    await locationCollection.updateOne( { _id : new ObjectId( location_id ) }, { $set : { average_saftey_rating : average } } )
 
-    return reviewId
+    return reviewId.toString()
 
 }
 
 const getReviewById = async (id) => {
     id = checkId(id)
     const reviewCollection = await reviews()
-    const review = await commentCollection.findOne({
+    const review = await reviewCollection.findOne({
         _id: new ObjectId(id)
     })
     if (!review) {
@@ -92,11 +101,11 @@ const getReviewById = async (id) => {
 
 const getAllReviews = async () => {
     const reviewCollection = await reviews();
-    let reviewList = await userCollection.find({}).toArray(); 
+    let reviewList = await reviewCollection.find({}).toArray(); 
     return reviewList;
 }
 
-const updateReview = async (id, content, pictures, safteyRating) => {
+const updateReview = async (id, content, safteyRating) => {
     id = checkId(id)
     let updated_fields = {}
 
@@ -106,14 +115,15 @@ const updateReview = async (id, content, pictures, safteyRating) => {
         updated_fields.content = content
     }
 
-    if (pictures){
-        //Deal with later
-    }
+    // if (pictures){
+    //     //Deal with later
+    // }
 
     if(safteyRating){
         safteyRating = checkNumericString(safteyRating)
         const parseSafteyRating = Number(safteyRating)
         check_number_range(parseSafteyRating, 1, 5)
+        updated_fields.safteyRating = parseSafteyRating
     }
 
     if (Object.keys(updated_fields).length === 0) {
@@ -121,6 +131,8 @@ const updateReview = async (id, content, pictures, safteyRating) => {
     }
 
     const reviewCollection = await reviews()
+    let curr_rev = await reviewCollection.findOne({_id : new ObjectId(id)})
+    let curr_rev_rating = curr_rev.safteyRating
     const updateInfo = await reviewCollection.findOneAndUpdate(
         { _id : new ObjectId(id) },
         { $set : updated_fields },
@@ -132,10 +144,24 @@ const updateReview = async (id, content, pictures, safteyRating) => {
     }
 
     if(safteyRating){
-        //Here we have to update the saftey rating of the location with the new average
+        safteyRating = checkNumericString(safteyRating)
+        const parseSafteyRating = Number(safteyRating)
+        check_number_range(parseSafteyRating, 1, 5)
+
+        const locationCollection = await locations()
+        let rev = await getReviewById(id)
+
+        const reviewsForLocation = await reviewCollection.find({ location_id: new ObjectId( rev.location_id ) }).toArray()
+        let sum = 0
+        for (let review of reviewsForLocation) {
+            sum += review.safteyRating
+            }
+        let average = reviewsForLocation.length === 0 ? 0 : sum / reviewsForLocation.length;
+        
+        await locationCollection.updateOne( { _id : new ObjectId( rev.location_id ) }, { $set : { average_saftey_rating : average } } )
     }
 
-    updateInfo._id = updateInfo._id.toString();
+    // updateInfo._id = updateInfo._id.toString();
 
     return updateInfo;
 
@@ -148,15 +174,15 @@ const removeReview = async (reviewId, userId) => {
 
     const reviewCollection = await reviews()
     const review = await reviewCollection.findOne({
-        _id: new ObjectId(id)
+        _id: new ObjectId(reviewId)
     })
     if (!review) {
         throw "Error: Review not found"
     }
-    if (review.userId !== userId){
+    if (review.user_id.toString() !== userId){
         throw "Provided user id is not the owner of the review"
     }
-    const review_location_id = review.location_id
+    const review_location_id = review.location_id.toString()
     const deleteInfo = await reviewCollection.deleteOne({
         _id: new ObjectId(reviewId)
     });
@@ -165,8 +191,8 @@ const removeReview = async (reviewId, userId) => {
     }
     const userCollection = await users()
     const updateUserInfo = await userCollection.updateOne(
-        { _id: userId }, 
-        { $pull: { reviews: new ObjectId(reviewId) } }
+        { _id: new ObjectId(userId) }, 
+        { $pull: { reviews: reviewId } }
     );
 
     if (!updateUserInfo) {
@@ -175,8 +201,8 @@ const removeReview = async (reviewId, userId) => {
 
     const locationCollection = await locations()
     const updateLocationInfo = await locationCollection.updateOne(
-        { _id: review_location_id }, 
-        { $pull: { reviews: new ObjectId(reviewId) } }
+        { _id: new ObjectId(review_location_id) }, 
+        { $pull: { reviews: reviewId } }
     );
 
     if (!updateUserInfo) {
@@ -191,5 +217,7 @@ const removeReview = async (reviewId, userId) => {
     };
 
 }
+
+
 
 export {removeReview, updateReview, getAllReviews, getReviewById, addReview}
