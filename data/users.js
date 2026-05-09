@@ -16,7 +16,13 @@ const getAllUsers = async () => {
 const getUserById = async (id) => {
     id = checkId(id, "getUserById Id");
     const userCollection = await users();
-    const user = await userCollection.findOne
+    const user = await userCollection.findOne({
+        _id: new ObjectId(id)
+    })
+    if (!user){
+        throw "Error: User not found"
+    }
+    return user
 }
 
 export const addUser = async (
@@ -38,8 +44,8 @@ export const addUser = async (
 ) => {
     first_name = checkString(first_name)
     last_name = checkString(last_name)
-    // username = checkString(username)
-    // email = checkString(email)
+    username = checkString(usernameInput)
+    email = checkString(emailInput)
     password = checkString(password)
     // profile_picture = checkString(profile_picture)
     age = checkNumericString(age)
@@ -128,4 +134,94 @@ export const addUser = async (
 
 export const authenticateMember = async () => {
     
+}
+
+const updateUser = async (
+    id, 
+    first_name,
+    last_name,
+    usernameInput, 
+    emailInput,
+    profile_picture,
+    age
+) => {
+    //For now I'll have update user only be able to update safe things like user information 
+    //Like age, username, profile_pic, first last name, email 
+    //Maybe password can have it's own function 
+
+    //First let's check the id: 
+    id = checkId(id)
+    let updated_fields = {}
+    const userCollection = await users();
+    if (first_name){ 
+        first_name = checkString(first_name)
+        first_name = first_name.toLowerCase()
+        check_length(first_name, 1, 50)
+        check_chars_1(first_name)
+        updated_fields.first_name = first_name
+    }
+    if (last_name){ 
+        last_name = checkString(last_name)
+        last_name = last_name.toLowerCase()
+        check_length(last_name, 1, 50)
+        check_chars_1(last_name)
+        updated_fields.last_name = last_name
+    }
+    if (usernameInput){
+        usernameInput = checkString(usernameInput)
+        usernameInput = usernameInput.toLowerCase()
+        check_length(usernameInput, 3, 20)
+        check_chars_2(usernameInput)
+        let usernameUser = await userCollection.findOne({ username: usernameInput })
+        if (usernameUser){
+            // Username is taken
+            throw "Error: Username in use."
+        }
+        updated_fields.username = usernameInput
+    }
+    if (emailInput){
+        emailInput = checkString(emailInput)
+        check_length(emailInput, 3, 100)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!(emailRegex.test(emailInput))){
+            throw "Error: Invalid email address" }
+        let emailUser = await userCollection.findOne({ email: emailInput })
+        if (emailUser){
+            // Username is taken
+            throw "Error: Email in use."
+        }
+        updated_fields.email = emailInput
+    }
+    if (profile_picture){
+        //Fix 
+        updated_fields.profile_picture = profile_picture
+    }
+    if (age) {
+        age = checkNumericString(age)
+        const parsedAge = Number(age)
+        check_number_range(parsedAge, 13, 120)
+        updated_fields.age = age
+    } 
+    if (Object.keys(updated_fields).length === 0) {
+        throw "You must provide at least one field to update"
+    }
+    const updateInfo = await userCollection.findOneAndUpdate(
+        { _id : new ObjectId(id) },
+        { $set : updated_fields },
+        { returnDocument : "after" }
+    );
+
+    if (!updateInfo) {
+        throw "Could not update user"
+    }
+
+    updateInfo._id = updateInfo._id.toString()
+
+    return updateInfo;
+
+}
+
+const removeUser = async (id) => {
+    id = checkId(id)
+    //How should I remove a user? 
 }

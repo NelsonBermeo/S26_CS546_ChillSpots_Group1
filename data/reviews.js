@@ -77,3 +77,117 @@ const addReview = async (
     return reviewId
 
 }
+
+const getReviewById = async (id) => {
+    id = checkId(id)
+    const reviewCollection = await reviews()
+    const review = await commentCollection.findOne({
+        _id: new ObjectId(id)
+    })
+    if (!review) {
+        throw "Error: Review not found"
+    }
+    return review
+}
+
+const getAllReviews = async () => {
+    const reviewCollection = await reviews();
+    let reviewList = await userCollection.find({}).toArray(); 
+    return reviewList;
+}
+
+const updateReview = async (id, content, pictures, safteyRating) => {
+    id = checkId(id)
+    let updated_fields = {}
+
+    if (content){
+        content = checkString(content)
+        check_length(content, 1, 1000)
+        updated_fields.content = content
+    }
+
+    if (pictures){
+        //Deal with later
+    }
+
+    if(safteyRating){
+        safteyRating = checkNumericString(safteyRating)
+        const parseSafteyRating = Number(safteyRating)
+        check_number_range(parseSafteyRating, 1, 5)
+    }
+
+    if (Object.keys(updated_fields).length === 0) {
+        throw "You must provide at least one field to update"
+    }
+
+    const reviewCollection = await reviews()
+    const updateInfo = await reviewCollection.findOneAndUpdate(
+        { _id : new ObjectId(id) },
+        { $set : updated_fields },
+        { returnDocument : "after" }
+    );
+
+    if (!updateInfo) {
+        throw "Could not update user"
+    }
+
+    if(safteyRating){
+        //Here we have to update the saftey rating of the location with the new average
+    }
+
+    updateInfo._id = updateInfo._id.toString();
+
+    return updateInfo;
+
+}
+
+const removeReview = async (reviewId, userId) => {
+    reviewId = checkId(reviewId)
+    userId = checkId(userId)
+    //Okay we have the userId because we need to make sure that the user is deleting their own review 
+
+    const reviewCollection = await reviews()
+    const review = await reviewCollection.findOne({
+        _id: new ObjectId(id)
+    })
+    if (!review) {
+        throw "Error: Review not found"
+    }
+    if (review.userId !== userId){
+        throw "Provided user id is not the owner of the review"
+    }
+    const review_location_id = review.location_id
+    const deleteInfo = await reviewCollection.deleteOne({
+        _id: new ObjectId(reviewId)
+    });
+    if (!deleteInfo.deletedCount) {
+        throw 'Error: Could not delete review';
+    }
+    const userCollection = await users()
+    const updateUserInfo = await userCollection.updateOne(
+        { _id: userId }, 
+        { $pull: { reviews: new ObjectId(reviewId) } }
+    );
+
+    if (!updateUserInfo) {
+        throw "Error could not remove review from user";
+    } 
+
+    const locationCollection = await locations()
+    const updateLocationInfo = await locationCollection.updateOne(
+        { _id: review_location_id }, 
+        { $pull: { reviews: new ObjectId(reviewId) } }
+    );
+
+    if (!updateUserInfo) {
+        throw "Error could not remove review from location";
+    } 
+
+    //Then I have to update the new saftey rating 
+
+    return {
+        reviewId: reviewId,
+        deleted: true
+    };
+
+}

@@ -2,6 +2,7 @@
     Handlebars Variables:
         errors: array for errors that occur during login
 }}
+{{> navbar}}
 <ul class="errorList" id="errors">
   {{#if errors}}
     {{#each errors}}
@@ -19,10 +20,5 @@
   <input type="password" id="password" name="password" />
   <br />
 
-  <input
-    type="submit"
-    id="submit_button"
-    name="submit_button"
-    value="Sign In"
-  />
+  <input type="submit" id="loginButton" name="loginButton" value="Sign In" />
 </form>

@@ -1,0 +1,49 @@
+{{!
+    Handlebars Variables:
+        errors: array for errors that occur during registration
+}}
+{{> navbar}}
+
+<ul class="errorList" id="errors">
+  {{#if errors}}
+    {{#each errors}}
+      <li>{{this}}</li>
+    {{/each}}
+  {{/if}}
+</ul>
+
+<form id="register-form" name="register-form" method="POST">
+  <label for="firstName">First Name: </label>
+  <input type="text" id="firstName" name="firstName" />
+  <br />
+  <label for="lastName">Last Name: </label>
+  <input type="text" id="lastName" name="lastName" />
+  <br />
+  <label for="username">Username: </label>
+  <input type="text" id="username" name="username" />
+  <br />
+  <label for="age">Username: </label>
+  <input type="number" id="age" name="age" min="0" max="120"/>
+  <br />
+
+  <label for="email">Email: </label>
+  <input type="email" id="email" name="email" />
+  <br />
+  <label for="password">Password: </label>
+  <input type="password" id="password" name="password" />
+  <br />
+  <label for="confirmPassword">Confirm Password: </label>
+  <input type="password" id="confirmPassword" name="confirmPassword" />
+  <br />
+
+  <label for="profilePic">Profile Picture: </label>
+  <input type="file" id="profilePic" name="profilePic" accept="image/*" />
+  <br />
+
+  <input
+    type="submit"
+    id="registerButton"
+    name="registerButton"
+    value="Register"
+  />
+</form>
