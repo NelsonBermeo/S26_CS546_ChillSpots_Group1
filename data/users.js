@@ -125,3 +125,7 @@ export const addUser = async (
     if (!insertInfo.insertedId || !insertInfo.acknowledged ) throw "Error: Insert Failed"
     return insertInfo.insertedId
 }
+
+export const authenticateMember = async () => {
+    
+}

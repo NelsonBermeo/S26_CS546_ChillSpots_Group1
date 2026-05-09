@@ -143,8 +143,8 @@ router
             req.body[key] = xss(req.body[key]);
         }
         let fieldsToNotPresent = {
-            username:       !req.body.username,
-            password:       !req.body.password,
+            email:    !req.body.email,
+            password: !req.body.password,
         }
         let fieldsNotPresent = Object.entries(fieldsToNotPresent).filter(([key, value]) => value).map(e => e[0]);
         if (fieldsNotPresent.length > 0) {
@@ -152,9 +152,8 @@ router
             for (let field of fieldsNotPresent) {
                 err_str += ` ${field},`;
             }
-            res.status(400).render('register', {
+            res.status(400).render('login', {
                 title: "ChillSpots - Login", 
-                currForm: req.body,
                 errors: [`The following fields were missing: ${err_str.slice(0, -1)}`]
             });
             return;
@@ -183,9 +182,9 @@ router
             req.session.member = userData;
 
             if (userData.membershipLevel === "admin") {
-
+                res.redirect("/admin");
             } else if (userData.membershipLevel === "member") {
-                
+                res.redirect("/user")
             }
         } catch (e) {
 
