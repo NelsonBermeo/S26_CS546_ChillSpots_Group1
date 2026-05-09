@@ -190,17 +190,187 @@ const addLocation = async (
 }
 
 const getLocationById = async (locationId) => {
+    locationId = checkId(locationId)
+    const locationCollection = await locations()
+    const location = await userCollection.findOne({
+        _id: new ObjectId(id)
+    })
+    if (!location){
+        throw "Error: User not found"
+    }
+    return location
+}
+
+const updateLocation = async (locationid, pictures,
+    tags) => {
+    //Users should not be able to change the name, address, zipcode, coordinates, 
+    //Users can update the pictures, and tags  
+    locationid = checkId(loocationid)
+    let updated_fields = {} 
+    const locationCollection = await locations()
     
-}
+    if (pictures) {
+        //Upadte the pictures 
+        updated_fields.pictures = pictures 
+    }
+    const allowedTags = [
+        "park",
+        "pier",
+        "lake",
+        "river",
+        "beach",
+        "quiet",
+        "calm",
+        "scenic",
+        "view",
+        "sunset",
+        "nature",
+        "walk",
+        "hike",
+        "trail",
+        "grass",
+        "trees",
+        "garden",
+        "picnic",
+        "study",
+        "date",
+        "friends",
+        "family",
+        "food",
+        "coffee",
+        "shops",
+        "photo",
+        "skyline",
+        "water",
+        "fishing",
+        "sports",
+        "bike",
+        "dog",
+        "kids",
+        "safe",
+        "crowded",
+        "hidden",
+        "relax",
+        "urban",
+        "open",
+        "shade",
+        "sunny",
+        "benches",
+        "free",
+        "clean",
+        "music",
+        "art",
+        "historic",
+        "night",
+        "morning",
+        "chill"
+    ]
 
-const updateLocation = async (locationId) => {
+    if (tags) {
+        if (!Array.isArray(tags)) throw "Error: Tags must be an array"
 
-}
+        if (tags.length > 10) throw "Error: A location can have at most 10 tags"
+        for (let i = 0; i < tags.length; i++){
+            tags[i] = checkString(tags[i])
+            check_length(tags[i], 1, 10)
+            if (!allowedTags.includes(tags[i])){
+                throw "Error: Tag is not allowed"
+            }
+        }
+        updated_fields.tags = tags
+    }
 
-const removeLocation = async (locatoinId) => {
+    const updateInfo = await userCollection.findOneAndUpdate(
+        { _id : new ObjectId(id) },
+        { $set : updated_fields },
+        { returnDocument : "after" }
+    );
 
+    if (!updateInfo) {
+        throw "Could not update user"
+    }
+
+    updateInfo._id = updateInfo._id.toString()
+
+    return updateInfo;
+
+} 
+
+const removeLocation = async (locationId) => {
+//...
 }
 
 const getAllLocations = async () => {
-
+    const userCollection = await users();
+    let userList = await userCollection.find({}).toArray(); 
+    return userList; 
+    // Will this return a list of jsons? Idk. 
 }
+
+const getLocationsByTag = async (tag) => {
+    const allowedTags = [
+        "park",
+        "pier",
+        "lake",
+        "river",
+        "beach",
+        "quiet",
+        "calm",
+        "scenic",
+        "view",
+        "sunset",
+        "nature",
+        "walk",
+        "hike",
+        "trail",
+        "grass",
+        "trees",
+        "garden",
+        "picnic",
+        "study",
+        "date",
+        "friends",
+        "family",
+        "food",
+        "coffee",
+        "shops",
+        "photo",
+        "skyline",
+        "water",
+        "fishing",
+        "sports",
+        "bike",
+        "dog",
+        "kids",
+        "safe",
+        "crowded",
+        "hidden",
+        "relax",
+        "urban",
+        "open",
+        "shade",
+        "sunny",
+        "benches",
+        "free",
+        "clean",
+        "music",
+        "art",
+        "historic",
+        "night",
+        "morning",
+        "chill"
+    ]
+    const locationCollection = await locations()
+    let locations_by_tag = []
+    let locations = getAllLocations();
+    for (let location in locations){
+    
+        if (allowedTags.includes(tag) && location.tags.includes(tag)) {
+            locations_by_tag.append(location)
+        }
+    
+    }
+    return locations_by_tag
+}
+
+
