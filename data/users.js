@@ -12,7 +12,7 @@ The user object schema:
     "username" : usernameInput,
     "email" : emailInput,
     "password" : hashed_password,
-    "reviews" : [], 
+    "reviews" : [], //LIST OF NORMAL ID STRINGS
     "friends_list" : [],
     "visited_locations_list" : [],
     "public_lists" : [],
@@ -249,7 +249,7 @@ const updateUser = async (
         throw "Could not update user"
     }
 
-    updateInfo._id = updateInfo._id.toString()
+    // updateInfo._id = updateInfo._id.toString() 
 
     return updateInfo; //returns the user object 
 
