@@ -7,8 +7,12 @@
     <p>Likes: <span class="reviewLikes">{{likes}}</span></p>
     <p>Dislikes: <span class="reviewDislikes">{{dislikes}}</span></p>
 
-    <a href="/reviews/{{_id}}/like" class="likeReview" data-id="{{_id}}">Like</a>
-    <a href="/reviews/{{_id}}/dislike" class="dislikeReview" data-id="{{_id}}">Dislike</a>
+    <form method="POST" action="/reviews/{{_id}}/like">
+      <button type="submit">Like</button>
+    </form>
+    <form method="POST" action="/reviews/{{_id}}/dislike">
+      <button type="submit">Dislike</button>
+    </form>
   </div>
 
   <p class="reviewContent">{{content}}</p>
