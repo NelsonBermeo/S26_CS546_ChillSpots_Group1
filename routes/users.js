@@ -10,13 +10,13 @@ const router = Router();
 TODO:
 -auth/login must store req.session.member._id because this file uses current middleware/auth.js session setup
 -routes/index.js currently mounts this at /user, so redirects should use /user/profile unless the mount is changed to /users
--profile.handlebars may expect top-level fields, while getUserById returns fields like first_name, last_name, profile_picture
 -data/users.js still needs:
   - getUserFriends(userId)
   - getUserPublicLists(userId)
   - getUserVisitedLocations(userId)
   - addFriend(userId, friendId)
   - createUserList(userId, listName, description)
+  - updateUser profile handling if POST /profile becomes functional
 */
 
 //renders a temporary "Not Implemented" error page for unfinished route functionality
@@ -27,11 +27,32 @@ const notImplemented = (res, todo) => {
   });
 };
 
+//builds a safe public user object without password, email, or other private fields
+const buildPublicUser = (user) => {
+  return {
+    _id: user._id.toString(),
+    firstName: user.first_name,
+    lastName: user.last_name,
+    username: user.username,
+    profilePic: user.profile_picture,
+    reviews: user.reviews || [],
+    friends: user.friends_list || [],
+    visited: user.visited_locations_list || [],
+    lists: user.public_lists || [],
+    achievements: user.achievements || []
+  };
+};
+
 //renders the currently logged-in user's profile page
 router.get('/profile', middleware.getuser, async (req, res) => {
   try {
     const userId = checkId(req.session.member._id, 'userId');
     const user = await getUserById(userId);
+
+    const profileUser = {
+      ...buildPublicUser(user),
+      email: user.email
+    };
 
     return res.render('profile', {
       title: 'My Profile',
@@ -49,6 +70,36 @@ router.get('/profile', middleware.getuser, async (req, res) => {
       loggedIn: true,
       isAdmin: req.session.member.role === 'admin'
     });
+  } catch (e) {
+    return res.status(400).render('error', {
+      title: 'Error',
+      error: e.toString()
+    });
+  }
+});
+
+//updates the currently logged-in user's profile information
+router.post('/profile', middleware.getuser, async (req, res) => {
+  try {
+    const userId = checkId(req.session.member._id, 'userId');
+
+    return notImplemented(
+      res,
+      'Requires updateUser profile form handling implementation in data/users.js.'
+    );
+
+    /*
+    const firstName = req.body.firstName ? checkString(xss(req.body.firstName), 'firstName') : undefined;
+    const lastName = req.body.lastName ? checkString(xss(req.body.lastName), 'lastName') : undefined;
+    const username = req.body.username ? checkString(xss(req.body.username), 'username') : undefined;
+    const email = req.body.email ? checkString(xss(req.body.email), 'email') : undefined;
+    const profilePic = req.body.profilePic ? xss(req.body.profilePic) : undefined;
+    const age = req.body.age;
+
+    await updateUser(userId, firstName, lastName, username, email, profilePic, age);
+
+    return res.redirect('/user/profile');
+    */
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Error',
@@ -143,7 +194,7 @@ router.get('/:id/friends', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Friends`,
-      user,
+      ...buildPublicUser(user),
       friends
     });
     */
@@ -171,7 +222,7 @@ router.get('/:id/lists', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Lists`,
-      user,
+      ...buildPublicUser(user),
       lists
     });
     */
@@ -199,7 +250,7 @@ router.get('/:id/visited', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Visited Spots`,
-      user,
+      ...buildPublicUser(user),
       visited
     });
     */
@@ -219,16 +270,7 @@ router.get('/:id', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Profile`,
-      user,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      username: user.username,
-      profilePic: user.profile_picture,
-      reviews: user.reviews || [],
-      friends: user.friends_list || [],
-      visited: user.visited_locations_list || [],
-      lists: user.public_lists || [],
-      achievements: user.achievements || []
+      ...buildPublicUser(user)
     });
   } catch (e) {
     return res.status(400).render('error', {

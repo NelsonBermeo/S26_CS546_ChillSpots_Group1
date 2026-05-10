@@ -13,8 +13,8 @@ TODO:
   - toggleReviewLike(reviewId, userId)
   - toggleReviewDislike(reviewId, userId)
 -data/reviews.js currently stores reaction counts only, so duplicate prevention needs likedBy/dislikedBy arrays or another tracking method
--comments functionality is intentionally being kept separate for now in comments.js
--data/comments.js import/mounting still needs to be fixed before comments can work
+-comments functionality is currently scaffolded here because the review partial posts to /reviews/:id/comments
+-data/comments.js import/mounting still needs to be fixed before comments can fully work
 */
 
 //checks whether the request expects a JSON response instead of a rendered page
@@ -26,6 +26,14 @@ const wantsJson = (req) => {
 const notImplementedJson = (res, todo) => {
   return res.status(501).json({
     success: false,
+    error: todo
+  });
+};
+
+//renders a temporary "Not Implemented" error page for unfinished form/page functionality
+const notImplementedRender = (res, todo) => {
+  return res.status(501).render('error', {
+    title: 'Not Implemented',
     error: todo
   });
 };
@@ -88,13 +96,45 @@ router.post('/:id/dislike', middleware.getuser, async (req, res) => {
   }
 });
 
+//adds a comment to a review
+router.post('/:id/comments', middleware.getuser, async (req, res) => {
+  try {
+    const reviewId = checkId(req.params.id, 'reviewId');
+    const userId = checkId(req.session.member._id, 'userId');
+
+    const commentContent = checkString(
+      xss(req.body.commentText || req.body.content),
+      'comment'
+    );
+
+    check_length(commentContent, 1, 1000);
+
+    return notImplementedRender(
+      res,
+      'Requires comment creation implementation in data/comments.js or data/reviews.js.'
+    );
+
+    /*
+    await addComment(reviewId, userId, commentContent);
+
+    return res.redirect(req.get('Referrer') || '/');
+    */
+  } catch (e) {
+    return res.status(400).render('error', {
+      title: 'Comment Error',
+      error: e.toString()
+    });
+  }
+});
+
 //submits a report against a review for moderation/admin review
 router.post('/:id/reports', middleware.getuser, async (req, res) => {
   try {
     const reviewId = checkId(req.params.id, 'reviewId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    const reason = checkString(xss(req.body.reason), 'reason');
+    const rawReason = req.body.reason || req.body.content;
+    const reason = checkString(xss(rawReason), 'reason');
     check_length(reason, 5, 500);
 
     await reports.addReport(userId, reviewId, 'review', reason);
