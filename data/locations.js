@@ -400,7 +400,7 @@ const getLocationByFilters = async (userId, likes, friend_visited, zip, name, ta
         check_length(name, 1, 100)
         const locationNameRegex = /^[A-Za-z0-9 .'-]+$/;
         if (!locationNameRegex.test(name)) { 
-            throw "Error: Name is no correct" 
+            throw "Error: Name is not correct" 
         }
         filters.name = {$regex: name, $options: "i" } //contains name & case insens
     }

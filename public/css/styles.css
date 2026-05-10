@@ -195,6 +195,10 @@ footer li {
   margin: 2px 0;
 }
 
+.search_error {
+  color: red;
+}
+
 /* responsive navbar */
 @media (max-width: 1100px) {
   .navbar {
