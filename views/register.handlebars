@@ -12,7 +12,7 @@ errors: array for errors that occur during registration
   {{/if}}
 </ul>
 
-<form id="register-form" name="register-form" method="POST" enctype="multipart/form-data">
+<form id="register-form" name="register-form" method="POST" enctype="multipart/form-data" action="/register">
   <label for="firstName">First Name: </label>
   <input type="text" id="firstName" name="firstName" value="{{currForm.firstName}}" />
   <br />
@@ -22,7 +22,7 @@ errors: array for errors that occur during registration
   <label for="username">Username: </label>
   <input type="text" id="username" name="username" value="{{currForm.username}}" />
   <br />
-  <label for="age">age: </label>
+  <label for="age">Age: </label>
   <input type="number" id="age" name="age" min="13" max="120" value="{{currForm.age}}" />
   <br />
 
@@ -37,7 +37,7 @@ errors: array for errors that occur during registration
   <br />
 
   <label for="profilePic">Profile Picture: </label>
-  <input type="file" id="profilePic" name="profilePic" accept="image/*" />
+  <input type="file" id="profilePic" name="profilePic" accept="image/jpeg,image/png,image/webp" />
   <br />
 
   <label for="adminSecret">Admin Secret (leave blank to remain a regular user): </label>

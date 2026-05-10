@@ -1,8 +1,8 @@
 {{> navbar}}
 
 <main>
-    <h1>{{name}}</h1>
-    <p>Creator: {{username}}</p>
+    <h1>{{list.name}}</h1>
+    <p>Creator: {{list.username}}</p>
 
     {{#if tags.length}}
     <p>Tags:
@@ -11,7 +11,7 @@
         {{/each}}
     </p>
     {{/if}}
-    <p>Number of locations: {{location_list.length}}</p>
+    <p>Number of locations: {{locations.length}}</p>
     {{#if editsAllowed}}
     <form id="editPublicListForm" method="POST" action="/publiclists/{{list._id}}/edit">
         <label for="listName">List Name: </label>
@@ -23,7 +23,7 @@
     {{#if editsAllowed}}
     <section>
         <h2>Add a Location</h2>
-        <form class="addLocationToListForm" method="POST" action="/publiclists/{{../list._id}}/locations">
+        <form class="addLocationToListForm" method="POST" action="/publiclists/{{list._id}}/locations">
             <label for="locationID">Choose a location:</label>
             <select id="locationID" name="locationID">
                 <option value="">Select a location</option>
@@ -42,16 +42,17 @@
         <ul>
             {{#each locations}}
             <li>
-                <a href=" /locations/{{_id}}">{{name}}</a>
+                <a href="/locations/{{_id}}">{{name}}</a>
                 <p>{{address}}</p>
 
                 {{#if ../editsAllowed}}
                 <form class="deleteLocationFromListForm" method="POST"
                     action="/publiclists/{{../list._id}}/locations/{{_id}}/remove">
-                    <input type="submit" value="Remove From List" id="removeLocFromList" />
+                    <input type="submit" value="Remove From List" class="removeLocFromList" />
                 </form>
                 {{/if}}
             </li>
+            {{/each}}
         </ul>
         {{else}}
         <p>This list has no locations currently.</p>

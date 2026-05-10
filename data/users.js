@@ -146,6 +146,8 @@ const addUser = async (
     } else {
         profile_picture = profile_picture.trim()
     }
+
+    // if (profile_picture.startsWith("public/uploads/"))
     // profile picture is optional; maybe I should check if they uploaded a valid path
 
     const newUser = {
@@ -230,7 +232,11 @@ const updateUser = async (
     }
     if (profile_picture){
         //Fix 
-        updated_fields.profile_picture = profile_picture
+        if (profile_picture === undefined || profile_picture === null || profile_picture.trim() === "" ){
+            throw "Error: pfp"
+        } else {
+            updated_fields.profile_picture = profile_picture.trim()
+        }
     }
     if (age) {
         age = checkNumericString(age)
@@ -308,4 +314,16 @@ const checkUser = async (emailInput, password) => {
 
 }
 
-export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers}
+const userVisited = async (id, locationId) => {
+    id = checkId(id)
+    locationId = checkId(locationId)
+    const userCollection = await users();
+    let updateInfo = await userCollection.findOneAndUpdate(
+    { _id : new ObjectId(id) },
+    { $push : locationId.toString() },
+    { returnDocument : "after" }
+    )
+    return updateInfo
+}
+
+export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited}

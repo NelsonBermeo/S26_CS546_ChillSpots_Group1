@@ -1,0 +1,49 @@
+{{> navbar}}
+<main>
+    <h1>Add a ChillSpot</h1>
+    <ul class="errorList" id="errors">
+        {{#if errors}}
+        {{#each errors}}
+        <li>{{this}}</li>
+        {{/each}}
+        {{/if}}
+    </ul>
+
+    <form id="addLocationForm" method="POST" action="/location" enctype="multipart/form-data">
+        <label for="name">Name: </label>
+        <input type="text" id="name" name="name" />
+        <br />
+
+        <label for="address">Address: </label>
+        <input type="text" id="address" name="address" />
+        <br />
+
+        <label for="zip">ZIP Code: </label>
+        <input type="text" id="zipcode" name="zipcode" maxlength="5" />
+        <br />
+
+        <label for="lat">Latitude: </label>
+        <input type="text" id="lat" name="lat" />
+        <br />
+
+        <label for="lng">Longitude: </label>
+        <input type="text" id="lng" name="lng" />
+        <br />
+
+        <label for="locTags">Tags:</label>
+        <input type="text" id="locTags" name="locTags" list="tagsForNewLoc" multiple />
+        <datalist id="tagsForNewLoc">
+            {{#each allowedTags}}
+            <option value="{{this}}"></option>
+            {{/each}}
+        </datalist>
+        <br />
+
+        <label for="locPics">Location Pictures: </label>
+        <input type="file" id="locPics" name="locPics" accept="image/jpeg,image/png,image/webp" multiple />
+        <br />
+
+        <button type="submit">Add ChillSpot</button>
+
+    </form>
+</main>
