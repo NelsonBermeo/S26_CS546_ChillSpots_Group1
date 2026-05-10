@@ -137,6 +137,12 @@ export const validate = {
 		if (!/[0-9]/.test(password)) throw "Error: Password must contain at least one number";
 		if (!/[^A-Za-z0-9]/.test(password)) throw "Error: Password must contain at least one special character";
 		return password; 
+	},
+	admin_key : (key) => {
+		if (typeof key !== String) throw "Error: Admin key must be a string.";
+		if (key === "") return "user";
+		if (key === "SecretAdminKey") return "admin";
+		throw "Error: Admin key incorrect.";
 	}
 };
 

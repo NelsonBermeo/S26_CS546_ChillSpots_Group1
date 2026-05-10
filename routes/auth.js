@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import xss from 'xss';
 import { validate } from '../validation.js';
-import { addUser } from '../data/users.js';
+import { addUser, checkUser } from '../data/users.js';
 const router = Router();
 
 router.route('/').get(async (req, res) => {
@@ -31,7 +31,9 @@ router
             username:       !req.body.username,
             email:          !req.body.email,
             password:       !req.body.password,
-            confirmPass:    !req.body.confirmPass
+            confirmPass:    !req.body.confirmPass,
+            profilePic:     !req.body.profilePic,
+            adminSecret:    false
         }
         let fieldsNotPresent = Object.entries(fieldsToNotPresent).filter(([key, value]) => value).map(e => e[0]);
         if (fieldsNotPresent.length > 0) {
@@ -94,6 +96,12 @@ router
             req.body.age = null;
             errors.push(e);
         }
+        try {
+            validate.admin_key(req.body.adminSecret);
+        } catch (e) {
+            req.body.adminSecret = null;
+            errors.push(e);
+        }
         if (errors.length > 0) {
             res.status(400).render('register', {
                 title: "ChillSpots - Register Now", 
@@ -109,8 +117,9 @@ router
                 req.body.username,
                 req.body.email,
                 req.body.password,
-                null,
-                req.body.age
+                req.body.profilePic,
+                req.body.age,
+                req.body.adminSecret
             )
             if (!success) {
                 res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
@@ -176,12 +185,16 @@ router
             })
         }
         try {
-            const userData = await authenticateMember(req.body.username, req.body.password);
-            req.session.member = userData;
+            const userData = await checkUser(req.body.email, req.body.password);
+            req.session.member = {
+                first_name: userData.first_name,
+                last_name: userData.last_name,
+                role: userData.role
+            };
 
-            if (userData.membershipLevel === "admin") {
+            if (userData.role === "admin") {
                 res.redirect("/admin");
-            } else if (userData.membershipLevel === "member") {
+            } else if (userData.role === "user") {
                 res.redirect("/user")
             }
         } catch (e) {
