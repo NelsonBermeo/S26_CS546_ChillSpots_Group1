@@ -7,25 +7,13 @@
 <body>
   <main class="location">
     <h1>Location Page Demo</h1>
-    <form method="POST" id="reviewForm" action="/review/{{_id}}">
-    <label id="reviewFormLabel">
-      Write Your Review:</label>
-      <br>
-    <textarea id="reviewTextInput" name="content" required minlength="1" maxlength="1000"> 
-    </textarea>
-    <br> <!-- This is the content of our review for req.body -->
-    <label id="reviewSafetyOption">Choose A Safety Rating:</label>
-    <br>
-    <select id="reviewSafetyOption" name="safetyRating"> <!-- This is the safetyRating of our review for req.body -->
-    <option value="1">1: Dangerous</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5: Very Safe</option>
-    </select>
-    <br>
-    <button type="submit">Post Review</button>
-    </form>
+  <form method="POST" id="commentForm" action="/comment/{{_id}}"> <!-- Where the full link would be something like /reviews/locationId/comments/reviewId Im assuming, idrk -->
+  <label id="commentFormLabel">Write Your Comment:</label>
+  <br>
+  <textarea id="commentTextInput" name="content" required minlength="1" maxlength="1000"></textarea>
+  <br>
+  <button type="submit">Post Comment</button>
+  </form>
   </main>
 </body>
 </html>

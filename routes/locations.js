@@ -1,0 +1,30 @@
+import { Router } from 'express';
+import xss from 'xss';
+import { validate } from '../validation.js';
+import * as reports from '../data/reports.js'
+
+const router = Router();
+
+/**
+ * Ask about what an admin should be and how we're handling adding administrative users.
+ * 2 different methods:
+ * 1. Admins have the same pages and views as a normal viewer but each page grants them extra features.
+ *  - Such as the ability to see posts removed for being reported too often and deal with these posts as they
+ *    see fit.
+ * 2. Admins get their own dashboard page where they can see all reports for any purpose. Filter / sort 
+ *    by certain features of a report like date of report.
+ * 
+ * Technically both can exist, and imo is preferred. (Ask Patrick Hill.)
+ * 
+ */
+
+router
+    .route('/location')
+    .get(async (req, res) => {
+       
+    })
+    .post(async (req, res) => {
+
+    })
+
+export default router;

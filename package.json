@@ -17,6 +17,7 @@
 		"express": "^5.2.1",
 		"express-handlebars": "^9.0.1",
 		"express-session": "^1.19.0",
-		"mongodb": "^6.1.0"
+		"mongodb": "^6.1.0",
+		"xss": "^1.0.15"
 	}
 }
