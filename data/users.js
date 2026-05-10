@@ -326,4 +326,34 @@ const userVisited = async (id, locationId) => {
     return updateInfo
 }
 
+const addFriend = async (userId, friendId) => {
+    userId = checkId(userId)
+    friendId = checkId(friendId)
+    if (userId === friendId) {
+        throw "Error: You cannot add yourself as a friend"
+    }
+    const userCollection = await users()
+
+    const user = await userCollection.findOne({ _id: new ObjectId(userId)})
+    if (!user) {
+        throw "Error: User not found"
+    }
+    const friend = await userCollection.findOne({ _id: new ObjectId(friendId)})
+    if (!friend) {
+        throw "Error: Friend not found"
+    }
+    if (user.friends_list.includes(friendId)) {
+        throw "Error: This user is already friend"
+    }
+
+    const updateInfo = await userCollection.findOneAndUpdate(
+        { _id: new ObjectId(userId)},
+        { $push: { friends_list: friendId }}, 
+        { returnDocument: "after" }
+    )
+
+    if (!updateInfo) throw "Error: Could not add friend"
+    return updateInfo
+}
+
 export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited}
