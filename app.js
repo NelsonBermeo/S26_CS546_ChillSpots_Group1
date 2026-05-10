@@ -29,6 +29,8 @@ app.use("/login", middleware.getlogin);
 app.use("/user", middleware.getuser);
 app.use("/admin", middleware.getadmin);
 app.use("/signout", middleware.getsignout);
+app.use("/location", middleware.getlocation);
+app.use("/reviews", middleware.getreviews);
 
 configRoutes(app);
 
