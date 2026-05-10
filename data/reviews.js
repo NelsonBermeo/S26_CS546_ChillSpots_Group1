@@ -8,7 +8,7 @@ const addReview = async (
     //username, we don't need username if we have the userID already
     location_id,
     content,
-    // pictures, //We can add pictures later, let's just get the data functions working
+    pictures, //We can add pictures later, let's just get the data functions working
     // likes,
     // dislikes,
     // date,
@@ -41,12 +41,21 @@ const addReview = async (
     check_number_range(parseSafteyRating, 1, 5)
     //Optional, must be a number between 1 and 5.
 
+    if (!Array.isArray(pictures)){
+        throw "Error: Pictures must be an array."
+    } 
+    for (let i = 0; i < pictures.length; i++) { 
+        pictures[i] = checkString(pictures[i]);
+        check_length(pictures[i], 1, 1000)
+    }   
+
+
     const newReview = {
         "user_id" : new ObjectId(userId),
         "username" : userIdCheck.username,
         "location_id" : new ObjectId(location_id),
         "content" : content,
-        "pictures": [], //empty for now
+        "pictures": pictures, //empty for now
         "likes" : 0,
         "disikes" : 0,
         "date" : new Date(), //instant date

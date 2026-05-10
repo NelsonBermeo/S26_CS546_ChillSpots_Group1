@@ -5,21 +5,28 @@
         isLocation, isComment, isReview,
 -->
 {{> navbar}}
-
-<ul>
-  {{#each reports}}
-  <li class="report">
-    <p>Reason for Report: {{reason}}</p>
-    <p>Content in Reported {{type}}: {{content}}</p>
-    {{#if isLocation}}
-    <button onclick="deleteLocation({{id}})">Delete Location</button>
-    {{/if}}
-    {{#if isComment}}
-    <button onclick="deleteComment({{id}})">Delete Comment</button>
-    {{/if}}
-    {{#if isReview}}
-    <button onclick="deleteReview({{id}})">Delete Review</button>
-    {{/if}}
-  </li>
-  {{/each}}
-</ul>
+<div class="page-content">
+  <h1>Admin Dashboard</h1>
+  {{#if reports.length}}
+  <ul style="list-style:none;padding:0;">
+    {{#each reports}}
+    <li class="report">
+      <p><strong>Type:</strong> {{type}}</p>
+      <p><strong>Report:</strong> {{content}}</p>
+      {{#if isLocation}}
+      <button class="btn-danger" onclick="deleteLocation('{{item_id}}')">Delete Location</button>
+      {{/if}}
+      {{#if isComment}}
+      <button class="btn-danger" onclick="deleteComment('{{item_id}}')">Delete Comment</button>
+      {{/if}}
+      {{#if isReview}}
+      <button class="btn-danger" onclick="deleteReview('{{item_id}}')">Delete Review</button>
+      {{/if}}
+    </li>
+    {{/each}}
+  </ul>
+  {{else}}
+  <p>No reports to review.</p>
+  {{/if}}
+</div>
+{{> footer}}

@@ -7,8 +7,9 @@ email
 profilePic
 }}
 {{> navbar}}
-
-<main>
+<div class="page-content">
+  <div class="card">
+    <h1>Edit Profile</h1>
   <form id="profileForm" method="POST" action="/user/profile" enctype="multipart/form-data">
     <label for="firstName">First Name: </label>
     <input type="text" id="firstName" name="firstName" value="{{firstName}}" />
@@ -41,6 +42,8 @@ profilePic
     <input type="file" id="newProfilePic" name="newProfilePic" accept="image/*" />
     <br />
 
-    <button type="submit">Update</button>
+    <button type="submit" class="btn-primary">Update Profile</button>
   </form>
-</main>
+  </div>
+</div>
+{{> footer}}
