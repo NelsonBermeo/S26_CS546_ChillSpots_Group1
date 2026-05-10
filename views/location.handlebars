@@ -2,7 +2,7 @@
 <main class="location">
     <h1>{{name}}</h1>
     <p class="locAddress">{{address}}</p>
-    {{#each pictures}}
+    {{#each images}}
     <img src="{{this}}" class="locationImage" />
     {{/each}}
 
@@ -21,14 +21,14 @@
     <!-- Something to keep in mind is that our input's need names. Express reads fields from req.body using name -->
     <!-- Also, action, as stated in the slideshow: "signifies where the form will be submitted to" -> After some googling I realized that this meant to what URL:
 for example url/questions, we will send the review to url/reviews/{{_id}} which is the id of the location we are currently viewing -->
-    <form method="POST" id="reviewForm" action="/reviews/{{_id}}">
+    <form method="POST" id="reviewForm" action="/location/{{_id}}/reviews" enctype="multipart/form-data">
         <label id="reviewFormLabel">
             Write Your Review:</label>
         <br>
         <textarea id="reviewTextInput" name="content" required minlength="1" maxlength="1000">
         </textarea>
         <br> <!-- This is the content of our review for req.body -->
-        <label id="reviewSafetyOption">Choose A Safety Rating:</label>
+        <label for="reviewSafetyOption">Choose A Safety Rating:</label>
         <br>
         <select id="reviewSafetyOption" name="safetyRating">
             <!-- This is the safetyRating of our review for req.body -->

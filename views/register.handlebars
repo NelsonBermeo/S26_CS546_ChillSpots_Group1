@@ -12,7 +12,7 @@ errors: array for errors that occur during registration
   {{/if}}
 </ul>
 
-<form id="register-form" name="register-form" method="POST" enctype="multipart/form-data">
+<form id="register-form" name="register-form" method="POST" enctype="multipart/form-data" action="/register">
   <label for="firstName">First Name: </label>
   <input type="text" id="firstName" name="firstName" value="{{currForm.firstName}}" />
   <br />

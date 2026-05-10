@@ -8,7 +8,7 @@
         <input type="text" id="listName" name="listName" /><br>
 
         <label for="listTags">Tags:</label>
-        <input type="text" id="listTags" list="tagsForNewList" />
+        <input type="text" id="listTags" name="listTags" list="tagsForNewList" />
         <datalist id="tagsForNewList">
             {{#each allowedTags}}
             <option value="{{this}}"></option>
