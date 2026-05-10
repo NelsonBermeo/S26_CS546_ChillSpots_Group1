@@ -87,7 +87,7 @@ try {
 console.log("------------------Loc---------------------")
 
 try {
-  locid = await getUserById(testuser)
+  locid = await getLocationById(testlocation)
   console.log(locid)
 } catch (e) {
   console.log(e)
