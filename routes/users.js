@@ -45,7 +45,9 @@ router.get('/profile', middleware.getuser, async (req, res) => {
       friends: user.friends_list || [],
       visited: user.visited_locations_list || [],
       lists: user.public_lists || [],
-      achievements: user.achievements || []
+      achievements: user.achievements || [],
+      loggedIn: true,
+      isAdmin: req.session.member.role === 'admin'
     });
   } catch (e) {
     return res.status(400).render('error', {

@@ -79,7 +79,9 @@ router
 
       return res.render('location', {
         title: 'Locations',
-        locations
+        locations,
+        loggedIn: true,
+        isAdmin: req.session.member.role === 'admin'
       });
     } catch (e) {
       return res.status(400).render('error', {
