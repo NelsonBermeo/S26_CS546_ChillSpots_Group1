@@ -2,11 +2,18 @@
     <h2>Location Search</h2>
     <form action="/location" method="GET" class="search-locations">
         <label for="query">Looking for somewhere? Try to find it here!</label>
-        <input
-            type="text"
-            id="query"
-            name="query"
-            placeholder="Search for locations here..."
-            value="{{query}}"/>
+        <input type="text" id="query" name="query" placeholder="Search for locations here..." value="{{query}}"/>
+        
+        <input type="text" name="zip" placeholder="Zipcode search here..."/>
+        <input type="text" name="tags" placeholder="Tags search here... (comma-separated)"/>
+
+        <label for="likes">Sort by likes?</label>
+        <input type="checkbox" id="likes" name="likes" value="true">
+
+        <label for="friend_visited">Friends visited only?</label>
+        <input type="checkbox" id="friend_visited" name="friend_visited" value="true">
+
+        <br />
+        <button type="submit">Search</button>
     </form>
 </div>

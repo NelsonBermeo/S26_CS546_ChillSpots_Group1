@@ -16,7 +16,8 @@ import {
   getAllLocations,
   getLocationsByTag,
   getLocationsByName,
-  getLocationsByZip
+  getLocationsByZip,
+  getLocationByFilters
 } from '../data/locations.js';
 
 import {addReview} from '../data/reviews.js';
@@ -69,16 +70,46 @@ router
   .route('/')
   .get(async (req, res) => {
     try {
-      /** 
-      TODO:
-      A dedicated locations list/search view should eventually be created.
-      The current location.handlebars file is a detail page, not a browse page.
-      */
-      const locations = await queryFilteredLocs(req.query)
+      if (!req.session.member) {
+        res.status(403).redirect('..');
+        return;
+      }
+
+      let likes = undefined; 
+      if (req.query.likes === "true") {
+        likes = true;
+      } else if (req.query.likes === "false") {
+        likes = false;
+      } 
+
+      let friend_visited = undefined;
+      if (req.query.friend_visited === "true") {
+        friend_visited = true;
+      } else if (req.query.friend_visited === "false") {
+        friend_visited = false;
+      } 
+
+      const zip = req.query.zip || null;
+
+      const name = req.query.query || null;
+
+      let tags = req.query.tags || null;
+      if (tags && typeof tags === "string") {
+        tags = tags.split(",").map(t => t.trim());
+      }
+      const locations = await getLocationByFilters(
+        req.session.member._id,
+        likes,
+        friend_visited,
+        zip,
+        name,
+        tags
+      );
+
       res.render('location', { 
         title: "ChillSpots - Search Locations",
         locations,
-        query: req.query.name || "",
+        query: req.query.query || "",
         loggedIn: true,
         isAdmin: req.session.member.role === 'admin'
       });
