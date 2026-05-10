@@ -22,6 +22,8 @@ import {
 import {addReview} from '../data/reviews.js';
 import * as reports from '../data/reports.js';
 
+import { queryFilteredLocs } from '../utils/helpers.js';
+
 const router = Router();
 
 /*
@@ -66,40 +68,19 @@ router
   .route('/')
   .get(async (req, res) => {
     try {
-      /*
+      /** 
       TODO:
       A dedicated locations list/search view should eventually be created.
       The current location.handlebars file is a detail page, not a browse page.
       */
-
-      return notImplemented(
-        res,
-        'Requires a dedicated locations browse/search view.'
-      );
-
-      /*
-      let locations = [];
-
-      if (req.query.name) {
-        const name = checkString(xss(req.query.name), 'name');
-        locations = await getLocationsByName(name);
-      } else if (req.query.zipcode) {
-        const zipcode = checkNumericString(xss(req.query.zipcode), 'zipcode');
-        locations = await getLocationsByZip(zipcode);
-      } else if (req.query.tags) {
-        const tags = parseTags(req.query.tags);
-        locations = await getLocationsByTag(tags);
-      } else {
-        locations = await getAllLocations();
-      }
-
-      return res.render('locations', {
-        title: 'Locations',
+      const locations = await queryFilteredLocs(req.query)
+      res.render('location', { 
+        title: "ChillSpots - Search Locations",
         locations,
+        query: req.query.name || "",
         loggedIn: true,
         isAdmin: req.session.member.role === 'admin'
       });
-      */
     } catch (e) {
       return res.status(400).render('error', {
         title: 'Locations Error',
