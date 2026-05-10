@@ -4,6 +4,9 @@ import { validate } from '../validation.js';
 import { addUser, checkUser } from '../data/users.js';
 const router = Router();
 
+import multer from 'multer';
+const upload = multer({dest: 'uploads/'});
+
 router.route('/').get(async (req, res) => {
     try {
         res.render('home', {title: "ChillSpots - Home"});
@@ -23,7 +26,7 @@ router
             return res.status(500).json({error : e});
         }
     })
-    .post(async (req, res) => {
+    .post(upload.single('profilePic'), async (req, res) => {
         for (let key in req.body) {
             req.body[key] = xss(req.body[key]);
         }
@@ -34,7 +37,6 @@ router
             email:          !req.body.email,
             password:       !req.body.password,
             confirmPass:    !req.body.confirmPass,
-            profilePic:     !req.body.profilePic,
             adminSecret:    false
         }
         let fieldsNotPresent = Object.entries(fieldsToNotPresent).filter(([key, value]) => value).map(e => e[0]);
@@ -79,13 +81,14 @@ router
             validate.password(req.body.password, "Password");
         } catch (e) {
             req.body.password = null;
+            var pass_failed = true;
             errors.push(e);
         }
         try {
             validate.password(req.body.confirmPass, "Confirmed Password");
         } catch (e) {
             req.body.confirmPass = null;
-            errors.push(e);
+            if (!pass_failed) errors.push(e);
         }
         if (req.body.password !== req.body.confirmPass) {
             errors.push("Confirmed password does not match password.");
@@ -119,7 +122,7 @@ router
                 req.body.username,
                 req.body.email,
                 req.body.password,
-                req.body.profilePic,
+                req.file,
                 req.body.age,
                 req.body.adminSecret
             )
@@ -152,7 +155,7 @@ router
             req.body[key] = xss(req.body[key]);
         }
         let fieldsToNotPresent = {
-            email:    !req.body.email,
+            username:    !req.body.username, //! SHOULD BE CALLED EMAIL. USING USERNAME FOR TESTING PURPOSES
             password: !req.body.password,
         }
         let fieldsNotPresent = Object.entries(fieldsToNotPresent).filter(([key, value]) => value).map(e => e[0]);
@@ -169,7 +172,7 @@ router
         }
         let errors = [];
         try {
-            validate.username(req.body.username, "Username");
+            validate.email(req.body.username, "Username");
         } catch (e) {
             req.body.username = null;
             errors.push(e);
@@ -187,7 +190,7 @@ router
             })
         }
         try {
-            const userData = await checkUser(req.body.email, req.body.password);
+            const userData = await checkUser(req.body.username, req.body.password); //! SHOULD BE EMAIL
             req.session.member = {
                 first_name: userData.first_name,
                 last_name: userData.last_name,
@@ -195,7 +198,7 @@ router
             };
 
             if (userData.role === "admin") {
-                res.redirect("/admin");
+                res.redirect("/admin/dashboard");
             } else if (userData.role === "user") {
                 res.redirect("/user")
             }
@@ -206,7 +209,7 @@ router
 
 router.route("/signout").get(async (req, res) => {
     req.session.destroy();
-    res.render('logout', {title: "ChillSpots - Logout"})
+    res.redirect('..');
 })
 
 export default router;
