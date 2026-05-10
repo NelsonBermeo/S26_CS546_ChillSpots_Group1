@@ -10,7 +10,6 @@ const router = Router();
 TODO:
 -auth/login must store req.session.member._id because this file uses current middleware/auth.js session setup
 -routes/index.js currently mounts this at /user, so redirects should use /user/profile unless the mount is changed to /users
--profile.handlebars may expect top-level fields, while getUserById returns fields like first_name, last_name, profile_picture
 -data/users.js still needs:
   - getUserFriends(userId)
   - getUserPublicLists(userId)
@@ -27,25 +26,36 @@ const notImplemented = (res, todo) => {
   });
 };
 
+//builds a safe public user object without password, email, or other private fields
+const buildPublicUser = (user) => {
+  return {
+    _id: user._id.toString(),
+    firstName: user.first_name,
+    lastName: user.last_name,
+    username: user.username,
+    profilePic: user.profile_picture,
+    reviews: user.reviews || [],
+    friends: user.friends_list || [],
+    visited: user.visited_locations_list || [],
+    lists: user.public_lists || [],
+    achievements: user.achievements || []
+  };
+};
+
 //renders the currently logged-in user's profile page
 router.get('/profile', middleware.getuser, async (req, res) => {
   try {
     const userId = checkId(req.session.member._id, 'userId');
     const user = await getUserById(userId);
 
+    const profileUser = {
+      ...buildPublicUser(user),
+      email: user.email
+    };
+
     return res.render('profile', {
       title: 'My Profile',
-      user,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      username: user.username,
-      email: user.email,
-      profilePic: user.profile_picture,
-      reviews: user.reviews || [],
-      friends: user.friends_list || [],
-      visited: user.visited_locations_list || [],
-      lists: user.public_lists || [],
-      achievements: user.achievements || []
+      ...profileUser
     });
   } catch (e) {
     return res.status(400).render('error', {
@@ -141,7 +151,7 @@ router.get('/:id/friends', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Friends`,
-      user,
+      ...buildPublicUser(user),
       friends
     });
     */
@@ -169,7 +179,7 @@ router.get('/:id/lists', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Lists`,
-      user,
+      ...buildPublicUser(user),
       lists
     });
     */
@@ -197,7 +207,7 @@ router.get('/:id/visited', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Visited Spots`,
-      user,
+      ...buildPublicUser(user),
       visited
     });
     */
@@ -217,16 +227,7 @@ router.get('/:id', async (req, res) => {
 
     return res.render('profile', {
       title: `${user.username}'s Profile`,
-      user,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      username: user.username,
-      profilePic: user.profile_picture,
-      reviews: user.reviews || [],
-      friends: user.friends_list || [],
-      visited: user.visited_locations_list || [],
-      lists: user.public_lists || [],
-      achievements: user.achievements || []
+      ...buildPublicUser(user)
     });
   } catch (e) {
     return res.status(400).render('error', {
