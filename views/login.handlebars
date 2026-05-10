@@ -3,22 +3,25 @@ Handlebars Variables:
 errors: array for errors that occur during login
 }}
 {{> navbar}}
-<ul class="errorList" id="errors">
-  {{#if errors}}
-  {{#each errors}}
-  <li>{{this}}</li>
-  {{/each}}
-  {{/if}}
-</ul>
+<div class="page-content">
+  <div class="card">
+    <h1>Sign In</h1>
+    <ul class="errorList" id="errors">
+      {{#if errors}}
+        {{#each errors}}
+          <li>{{this}}</li>
+        {{/each}}
+      {{/if}}
+    </ul>
+    <form id="signin-form" name="signin-form" method="POST" action="/login">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="{{currForm.email}}" />
 
-<form id="signin-form" name="signin-form" method="POST" action="/login">
-  <label for="email">Email: </label>
-  <input type="text" id="email" name="email" value="{{currForm.email}}" />
-  <br />
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" />
 
-  <label for="password">Password: </label>
-  <input type="password" id="password" name="password" />
-  <br />
-
-  <input type="submit" id="loginButton" name="loginButton" value="Sign In" />
-</form>
+      <input type="submit" id="loginButton" name="loginButton" value="Sign In" />
+    </form>
+  </div>
+</div>
+{{> footer}}
