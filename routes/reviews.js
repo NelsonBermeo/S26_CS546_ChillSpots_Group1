@@ -21,7 +21,8 @@ TODO:
 
 //checks whether the request expects a JSON response instead of a rendered page
 const wantsJson = (req) => {
-  return req.xhr || req.get('accept')?.includes('application/json');
+  const accept = req.get('accept') || '';
+  return req.xhr || accept.includes('application/json');
 };
 
 //returns a temporary JSON error response for unfinished AJAX/API functionality
@@ -46,22 +47,17 @@ router.post('/:id/like', middleware.getuser, async (req, res) => {
     const reviewId = checkId(req.params.id, 'reviewId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    const reaction = await toggleReviewLike(reviewId, userId);
+    await toggleReviewLike(reviewId, userId);
 
     try {
       await checkReviewLikeAchievements(reviewId);
     } catch (e) {
     }
 
-    return res.json({
-      success: true,
-      likes: reaction.likes,
-      dislikes: reaction.dislikes,
-      userLiked: reaction.userLiked
-    });
+    return res.redirect(req.get('Referrer') || '/');
   } catch (e) {
-    return res.status(400).json({
-      success: false,
+    return res.status(400).render('error', {
+      title: 'Review Like Error',
       error: e.toString()
     });
   }
@@ -73,17 +69,12 @@ router.post('/:id/dislike', middleware.getuser, async (req, res) => {
     const reviewId = checkId(req.params.id, 'reviewId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    const reaction = await toggleReviewDislike(reviewId, userId);
+    await toggleReviewDislike(reviewId, userId);
 
-    return res.json({
-      success: true,
-      likes: reaction.likes,
-      dislikes: reaction.dislikes,
-      userDisliked: reaction.userDisliked
-    });
+    return res.redirect(req.get('Referrer') || '/');
   } catch (e) {
-    return res.status(400).json({
-      success: false,
+    return res.status(400).render('error', {
+      title: 'Review Dislike Error',
       error: e.toString()
     });
   }

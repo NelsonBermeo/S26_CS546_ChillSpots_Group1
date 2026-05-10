@@ -246,12 +246,16 @@ const toggleReviewLike = async (reviewId, userId) => {
             { $pull: { likedBy: userId }, $inc: { likes: -1 } }
         );
     } else {
-        const ops = { $push: { likedBy: userId }, $inc: { likes: 1 } };
         if (dislikedBy.includes(userId)) {
-            ops.$pull = { dislikedBy: userId };
-            ops.$inc.disikes = -1;
+            await reviewCollection.updateOne(
+                { _id: new ObjectId(reviewId) },
+                { $pull: { dislikedBy: userId }, $inc: { disikes: -1 } }
+            );
         }
-        await reviewCollection.updateOne({ _id: new ObjectId(reviewId) }, ops);
+        await reviewCollection.updateOne(
+            { _id: new ObjectId(reviewId) },
+            { $push: { likedBy: userId }, $inc: { likes: 1 } }
+        );
     }
 
     const updated = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
@@ -279,12 +283,16 @@ const toggleReviewDislike = async (reviewId, userId) => {
             { $pull: { dislikedBy: userId }, $inc: { disikes: -1 } }
         );
     } else {
-        const ops = { $push: { dislikedBy: userId }, $inc: { disikes: 1 } };
         if (likedBy.includes(userId)) {
-            ops.$pull = { likedBy: userId };
-            ops.$inc.likes = -1;
+            await reviewCollection.updateOne(
+                { _id: new ObjectId(reviewId) },
+                { $pull: { likedBy: userId }, $inc: { likes: -1 } }
+            );
         }
-        await reviewCollection.updateOne({ _id: new ObjectId(reviewId) }, ops);
+        await reviewCollection.updateOne(
+            { _id: new ObjectId(reviewId) },
+            { $push: { dislikedBy: userId }, $inc: { disikes: 1 } }
+        );
     }
 
     const updated = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });

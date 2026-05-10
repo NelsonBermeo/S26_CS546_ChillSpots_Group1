@@ -252,22 +252,17 @@ router.post('/:id/like', middleware.getuser, async (req, res) => {
     const locationId = checkId(req.params.id, 'locationId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    const reaction = await toggleLocationLike(locationId, userId);
+    await toggleLocationLike(locationId, userId);
 
     try {
       await checkLocationLikeAchievements(locationId);
     } catch (e) {
     }
 
-    return res.json({
-      success: true,
-      likes: reaction.likes,
-      dislikes: reaction.dislikes,
-      userLiked: reaction.userLiked
-    });
+    return res.redirect(req.get('Referrer') || `/location/${locationId}`);
   } catch (e) {
-    return res.status(400).json({
-      success: false,
+    return res.status(400).render('error', {
+      title: 'Location Like Error',
       error: e.toString()
     });
   }
@@ -279,17 +274,12 @@ router.post('/:id/dislike', middleware.getuser, async (req, res) => {
     const locationId = checkId(req.params.id, 'locationId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    const reaction = await toggleLocationDislike(locationId, userId);
+    await toggleLocationDislike(locationId, userId);
 
-    return res.json({
-      success: true,
-      likes: reaction.likes,
-      dislikes: reaction.dislikes,
-      userDisliked: reaction.userDisliked
-    });
+    return res.redirect(req.get('Referrer') || `/location/${locationId}`);
   } catch (e) {
-    return res.status(400).json({
-      success: false,
+    return res.status(400).render('error', {
+      title: 'Location Dislike Error',
       error: e.toString()
     });
   }
