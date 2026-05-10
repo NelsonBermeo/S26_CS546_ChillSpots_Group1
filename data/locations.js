@@ -354,4 +354,89 @@ const getLocationByMostLikes = async () => {
     return locationList
 }
 
-export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByMostLikes}
+const getLocationByFilters = async (userId, likes, friend_visited, zip, name, tags) => {
+    userId = checkId(userId)
+    const locationCollection = await locations()
+    const userCollection = await users()
+    let user = await userCollection.findOne({ _id : new ObjectId(userId) })
+    if (!user){
+        throw "Error: User ID does not exist"
+    }
+    let filters = {}
+    if (likes !== undefined && likes !== null) { 
+        if (typeof likes !== 'boolean') {
+            throw "Error: Likes must be a boolean"
+        }
+    }
+    if (friend_visited !== undefined && friend_visited !== null){
+        if (typeof friend_visited !== 'boolean') {
+            throw "Error: Friends visited must be a boolean"
+        }
+    } 
+    if (zip){
+        zip = checkNumericString(zip)
+        check_length(zip, 5, 5)
+        filters.zipcode = zip
+    }
+    if (name){
+        name = checkString(name) 
+        check_length(name, 1, 100)
+        const locationNameRegex = /^[A-Za-z0-9 .'-]+$/;
+        if (!locationNameRegex.test(name)) { 
+            throw "Error: Name is no correct" 
+        }
+        filters.name = {$regex: name, $options: "i" } //contains name & case insens
+    }
+    if (tags){
+        if (!Array.isArray(tags)) throw "Error: Tags must be an array"
+        tags = tags.filter((item, index) => tags.indexOf(item) === index);
+        if (tags.length > 10) throw "Error: A location can have at most 10 tags"
+        for (let i = 0; i < tags.length; i++){
+            tags[i] = checkString(tags[i])
+            check_length(tags[i], 1, 10)
+            if (!allowedTags.includes(tags[i])){
+                throw "Error: Tag is not allowed"
+            }
+        }
+        filters.tags = {$all: tags} //check if the locaiton tags has tags
+
+    }
+    let locationList = await locationCollection.find(filters).toArray()
+    if (friend_visited === true) {
+
+        let friendIds = [] 
+        if (user.friends_list.length !== 0){
+            friendIds = user.friends_list
+        }
+        let friendObjectIds = friendIds.map((id) => new ObjectId(id))
+
+        let friends = await userCollection.find({ _id: { $in: friendObjectIds }}).toArray();
+
+        let visitedLocationIds = [];
+
+        for (let friend of friends) {
+            if (friend.visited_locations_list) {
+                for (let loc of friend.visited_locations_list){
+                    visitedLocationIds.push(loc.toString()) 
+                }
+            }
+        }
+        visitedLocationIds = visitedLocationIds.filter((item, index) => visitedLocationIds.indexOf(item) === index)
+
+        locationList = locationList.filter((location) => { //filters the final list to have only friend ones
+            return visitedLocationIds.includes(location._id.toString())
+        })
+    }
+    if (likes === true) {
+        locationList.sort((a, b) => b.likes - a.likes)
+    }
+
+    for (let location of locationList) {
+        location._id = location._id.toString()
+    }
+    return locationList
+
+}
+
+
+export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByMostLikes, getLocationByFilters}
