@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import xss from 'xss';
-import { validate } from '../validation.js';
+import { validate, checkId } from '../validation.js';
 import * as reports from '../data/reports.js'
+import * as comments from '../data/comments.js'
+import * as reviews from '../data/reviews.js'
+import * as locations from '../data/locations.js'
 
 const router = Router();
 
@@ -48,8 +51,39 @@ router
             }
         } else { res.redirect('/'); return; }
     })
-    .post(async (req, res) => {
+    .delete(async (req, res) => {
+        // This might need clientside js to directly inject the result into the delete method
+        req.params.reportId = checkId(req.params.reportId, "Report ID");
+        const report = await reports.getReportById(req.params.reportId);
 
+        switch (report.type) {
+        case "location":
+            try{
+                const location = await locations.getLocationById(report.item_id);
+                // What does it even mean to remove a location???
+                // Do we also delete any reviews with comments left at that location?
+                // Same question for reviews.
+                await locations.removeLocation(report.item_id);
+            } catch (e) {
+                res.status(404).render('error', {title: "Error", error: e})
+            }
+        case "comment":
+            try {
+                const comment = await comments.getCommentById(report.item_id);
+                await comments.removeComment(report.item_id);
+            } catch (e) {
+                res.status(404).render('error', {title: "Error", error: e})
+            }
+        case "review":
+            try {
+                const review = await reviews.getReviewById(report.item_id);
+                await reviews.removeReview(report.item_id);
+            } catch (e) {
+                res.status(404).render('error', {title: "Error", error: e})
+            }
+        default:
+            res.status(500).render('error', {title: "Error", error: `report type not found for: ${report.type}`})
+        }
     })
 
 export default router;

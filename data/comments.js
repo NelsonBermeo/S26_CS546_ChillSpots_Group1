@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { comments, reviews, users } from '../config/mongoCollections.js';
-import { checkId, checkString, check_length } from '../vaidation.js';
+import { checkId, checkString, check_length } from '../validation.js';
 
 //adding a comment onto a review
 const addComment = async (reviewId, userId, commentText) => {
