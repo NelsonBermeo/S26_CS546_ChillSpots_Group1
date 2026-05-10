@@ -18,12 +18,20 @@
   />
   <p class="reviewDislikes">Dislikes{{dislikes}}</p>
   <p class="reviewContent">{{content}}</p>
-  <input
+  {{!-- <input
     type="submit"
     value="Post a Comment for this Review!"
     onlick="submitComment({{id}})"
     id="postCommentButton"
-  />
+  /> --}}
+  <!-- We will replcae input with our form! -->
+  <form method="POST" id="commentForm" action="/comments/{{_id}}"> <!-- Where the full link would be something like /reviews/locationId/comments/reviewId, but idrk -->
+  <label id="commentFormLabel">Write Your Comment:</label>
+  <br>
+  <textarea id="commentTextInput" name="content" required minlength="1" maxlength="1000"></textarea>
+  <br>
+  <button type="submit">Post Comment</button>
+  </form>
   {{#each comments}}
     {{> comment this}}
   {{/each}}
