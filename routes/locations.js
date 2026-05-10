@@ -95,7 +95,9 @@ router
 
       return res.render('locations', {
         title: 'Locations',
-        locations
+        locations,
+        loggedIn: true,
+        isAdmin: req.session.member.role === 'admin'
       });
       */
     } catch (e) {

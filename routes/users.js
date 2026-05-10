@@ -56,7 +56,19 @@ router.get('/profile', middleware.getuser, async (req, res) => {
 
     return res.render('profile', {
       title: 'My Profile',
-      ...profileUser
+      user,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      username: user.username,
+      email: user.email,
+      profilePic: user.profile_picture,
+      reviews: user.reviews || [],
+      friends: user.friends_list || [],
+      visited: user.visited_locations_list || [],
+      lists: user.public_lists || [],
+      achievements: user.achievements || [],
+      loggedIn: true,
+      isAdmin: req.session.member.role === 'admin'
     });
   } catch (e) {
     return res.status(400).render('error', {
