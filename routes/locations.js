@@ -83,38 +83,53 @@ router
       } else if (req.query.likes === "false") {
         likes = false;
       } 
-
+      
       let friend_visited = undefined;
       if (req.query.friend_visited === "true") {
         friend_visited = true;
       } else if (req.query.friend_visited === "false") {
         friend_visited = false;
       } 
-
+      
       const zip = req.query.zip || null;
-
-      const name = req.query.query || null;
-
+      
+      const name = req.query.loc_name || null;
+      
       let tags = req.query.tags || null;
       if (tags && typeof tags === "string") {
         tags = tags.split(",").map(t => t.trim());
       }
-      const locations = await getLocationByFilters(
+      try {
+        const locations = await getLocationByFilters(
         req.session.member._id,
         likes,
         friend_visited,
         zip,
-        name,
-        tags
-      );
+          name,
+          tags
+        );
 
-      res.render('location', { 
-        title: "ChillSpots - Search Locations",
-        locations,
-        query: req.query.query || "",
-        loggedIn: true,
-        isAdmin: req.session.member.role === 'admin'
-      });
+        res.render('location', { 
+          title: "ChillSpots - Search Locations",
+          locations,
+          query: req.query.loc_name || "",
+          zip: req.query.zip || "",
+          tags : req.query.tags || "",
+          loggedIn: true,
+          isAdmin: req.session.member.role === 'admin'
+        });
+      } catch (err) {
+        res.status(400).render('location', { 
+          title: "ChillSpots - Search Locations",
+          error: err,
+          locations: undefined,
+          query: req.query.loc_name || "",
+          zip: req.query.zip || "",
+          tags : req.query.tags || "",
+          loggedIn: true,
+          isAdmin: req.session.member.role === 'admin'
+        });
+      }
     } catch (e) {
       return res.status(400).render('error', {
         title: 'Locations Error',

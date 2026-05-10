@@ -1,11 +1,15 @@
 <div class="searchbar">
     <h2>Location Search</h2>
+    {{#if error}}
+        <h3>An error occured while searching:</h3>
+        <p class="search_error">{{error}}</p>
+    {{/if}}
     <form action="/location" method="GET" class="search-locations">
-        <label for="query">Looking for somewhere? Try to find it here!</label>
-        <input type="text" id="query" name="query" placeholder="Search for locations here..." value="{{query}}"/>
+        <label for="loc_name">Looking for somewhere? Try to find it here!</label>
+        <input type="text" id="loc_name" name="loc_name" placeholder="Search for locations here..." value="{{query}}"/>
         
-        <input type="text" name="zip" placeholder="Zipcode search here..."/>
-        <input type="text" name="tags" placeholder="Tags search here... (comma-separated)"/>
+        <input type="text" name="zip" placeholder="Zipcode search here..." value="{{zip}}"/>
+        <input type="text" name="tags" placeholder="Tags search here... (comma-separated)" value="{{tags}}"/>
 
         <label for="likes">Sort by likes?</label>
         <input type="checkbox" id="likes" name="likes" value="true">

@@ -320,3 +320,7 @@ footer ul {
 footer li {
   margin: 2px 0;
 }
+
+.search_error {
+  color: red;
+}
