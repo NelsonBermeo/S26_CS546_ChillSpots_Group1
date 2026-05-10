@@ -26,7 +26,7 @@ for example url/questions, we will send the review to url/reviews/{{_id}} which 
             Write Your Review:</label>
         <br>
         <textarea id="reviewTextInput" name="content" required minlength="1" maxlength="1000">
-    </textarea>
+        </textarea>
         <br> <!-- This is the content of our review for req.body -->
         <label id="reviewSafetyOption">Choose A Safety Rating:</label>
         <br>
@@ -38,6 +38,10 @@ for example url/questions, we will send the review to url/reviews/{{_id}} which 
             <option value="4">4</option>
             <option value="5">5: Very Safe</option>
         </select>
+        <br>
+        <label for="reviewPics">Location Pictures: </label>
+        <input type="file" id="reviewPics" name="reviewPics" accept="image/jpeg,image/png,image/webp" multiple />
+        <br />
         <br>
         <button type="submit">Post Review</button>
     </form>
