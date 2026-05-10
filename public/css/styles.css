@@ -275,6 +275,97 @@ input[type="submit"]:hover,
   font-size: 0.93rem;
 }
 
+/* Profile pic */
+.originalProfilePic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 3px solid #2e7d52;
+}
+
+/* Location page */
+.location {
+  line-height: 1.6;
+}
+
+.locAddress {
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.locationImage,
+.reviewPic {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 6px;
+  margin: 6px 4px 6px 0;
+  object-fit: cover;
+}
+
+.locationReactions,
+.reviewReactions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.locationReactions a,
+.reviewReactions a {
+  color: #2e7d52;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 5px 14px;
+  border: 1px solid #2e7d52;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  transition: background-color 0.2s;
+}
+
+.locationReactions a:hover,
+.reviewReactions a:hover {
+  background-color: #e8f5ee;
+}
+
+/* Review */
+.review {
+  border-top: 1px solid #e5e5e5;
+  padding: 20px 0;
+}
+
+.reviewAuthor {
+  font-weight: 600;
+  color: #1e5c3a;
+}
+
+.reviewDate,
+.reviewRating,
+.reviewSafetyRating {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.reviewContent {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+/* Comment */
+.commentList {
+  margin-top: 12px;
+  padding-left: 16px;
+  border-left: 3px solid #e8f5ee;
+}
+
+/* Error text (inline) */
+.error {
+  color: #b71c1c;
+  font-size: 1rem;
+}
+
 /* Footer */
 footer {
   background-color: #2e7d52;

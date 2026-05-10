@@ -1,5 +1,6 @@
 {{> navbar}}
-<main class="location">
+<div class="page-content">
+<main class="location card">
     <h1>{{name}}</h1>
     <p class="locAddress">{{address}}</p>
     <p>ZIP Code: {{zipcode}}</p>
@@ -82,3 +83,5 @@ for example url/questions, we will send the review to url/reviews/{{_id}} which 
         {{/if}}
     </section>
 </main>
+</div>
+{{> footer}}
