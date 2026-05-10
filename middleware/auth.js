@@ -32,6 +32,24 @@ export const middleware = {
 
         next();
     },
+    getlogin : (req, res, next) => {
+        const isAuthenticated = Boolean(req.session.member);
+        if (!isAuthenticated) {
+            next();
+            return;
+        }
+        const memberState = req.session.member.role;
+        if (memberState === "admin") {
+            res.redirect('/admin');
+            return;
+        }
+        if (memberState === "user") {
+            res.redirect('/user');
+            return;
+        }
+
+        next();
+    },
     getuser : (req, res, next) => {
         const isAuthenticated = Boolean(req.session.member);
         if (!isAuthenticated) {

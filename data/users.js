@@ -61,7 +61,7 @@ const getUserById = async (id) => {
     return user //Returns the user object
 }
 
-export const addUser = async (
+const addUser = async (
     //Things we need to check: 
     // 1) Length of everything 
     first_name,

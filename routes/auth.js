@@ -12,6 +12,8 @@ router.route('/').get(async (req, res) => {
     }
 });
 
+router.route('/home').get(async (req, res) => { res.status(404).redirect('/'); })
+
 router
     .route('/register')
     .get(async (req, res) => {

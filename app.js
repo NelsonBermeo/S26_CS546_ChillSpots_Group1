@@ -19,6 +19,13 @@ app.use(session({
     saveUninitialized: false
 }))
 
+app.use('/', middleware.logger);
+app.use('/register', middleware.getregister);
+app.use('/login', middleware.getlogin);
+app.use('/user', middleware.getuser);
+app.use('/admin', middleware.getadmin);
+app.use('/signout', middleware.getsignout);
+
 configRoutes(app);
 
 app.listen(3000, () => {

@@ -25,15 +25,23 @@ router
             res.redirect('/');
             return;
         }
-        if (req.session.member.membershipLevel === "member") {
+        if (req.session.member.role === "member") {
             res.redirect('/user');
             return;
-        } else if (req.session.member.membershipLevel === "admin") {
+        } else if (req.session.member.role === "admin") {
             try {
-                const reportData = await getAllReports();
+                const reportData = await reports.getAllReports();
+                const reportList = reportData.map(e => ({
+                    type: e.type, 
+                    content: e.content,
+                    isLocation: (e.type === "location"),
+                    isComment: (e.type === "comment"),
+                    isReview: (e.type === "review"),
+                }));
+
                 res.render('admindashboard', {
                     title: "Admin Dashboard",
-                    data: reportData
+                    reports: reportList
                 })
             } catch (e) {
                 res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
