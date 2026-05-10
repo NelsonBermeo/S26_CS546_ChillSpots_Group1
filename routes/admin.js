@@ -50,6 +50,7 @@ router
 
                 res.render('admindashboard', {
                     title: "Admin Dashboard",
+                    page_script: "../public/js/admin.js",
                     reports: reportList
                 })
             } catch (e) {
