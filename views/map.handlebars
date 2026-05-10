@@ -1,0 +1,20 @@
+<h1>ChillSpots Map</h1>
+<p>Click on a marker on the map to view details about it.</p>
+
+<div id="map"></div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    const map = L.map("map").setView([40.7195, -74.043], 10);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>contributors',
+    }).addTo(map);
+    for (let loc of {{ { locations } }}) {
+        let popup = `${loc.name}<br>${loc.address}<br>
+        Tags: ${loc.tags.join(", ")}<br>
+        Safety Rating: ${loc.average_safety_rating}/5<br>
+        <a href="/locations/${loc._id})">View More Info</a>`;
+        L.marker([loc.coordinates.lat, loc.coordinates.lng]).addTo(map).bindPopup(popup);
+    }
+</script>
