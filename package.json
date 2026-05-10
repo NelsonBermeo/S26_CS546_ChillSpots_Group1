@@ -6,7 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"seed": "node ./tasks/seed.js",
-		"test_user": "node ./tasks/testUsers.js",
+		"test_user": "node ./tasks/testUsersLocations.js",
 		"start": "node app.js"
 	},
 	"author": "",
@@ -16,6 +16,7 @@
 		"bcryptjs": "^3.0.3",
 		"express": "^5.2.1",
 		"express-handlebars": "^9.0.1",
+		"express-session": "^1.19.0",
 		"mongodb": "^6.1.0"
 	}
 }

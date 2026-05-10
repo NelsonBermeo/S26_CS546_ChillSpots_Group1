@@ -12,7 +12,7 @@ The user object schema:
     "username" : usernameInput,
     "email" : emailInput,
     "password" : hashed_password,
-    "reviews" : [], 
+    "reviews" : [], //LIST OF NORMAL ID STRINGS
     "friends_list" : [],
     "visited_locations_list" : [],
     "public_lists" : [],
@@ -159,7 +159,7 @@ const addUser = async (
         "profile_picture" : profile_picture, 
         "achievements" : [],
         "added_locations_list" : [],
-        "age" : age,
+        "age" : parsedAge,
         "role" : "user"
     }
 
@@ -234,7 +234,7 @@ const updateUser = async (
         age = checkNumericString(age)
         const parsedAge = Number(age)
         check_number_range(parsedAge, 13, 120)
-        updated_fields.age = age
+        updated_fields.age = parsedAge
     } 
     if (Object.keys(updated_fields).length === 0) {
         throw "You must provide at least one field to update"
@@ -249,7 +249,7 @@ const updateUser = async (
         throw "Could not update user"
     }
 
-    updateInfo._id = updateInfo._id.toString()
+    // updateInfo._id = updateInfo._id.toString() 
 
     return updateInfo; //returns the user object 
 

@@ -6,10 +6,11 @@
   <div class="app-name">ChillSpots</div>
   <ul class="nav-links">
     <li class="nav-item"><a href="/home" class="nav-link">Home</a></li>
-    <li class="nav-item"><a href="/search" class="nav-link">Search All Locations</a></li>
     {{#if loggedIn}}
       <li class="nav-item"><a href="/profile" class="nav-link">Profile</a></li>
       <li class="nav-item"><a href="/signout" class="nav-link">Sign Out</a></li>
+      <li class="nav-item"><a href="/search" class="nav-link">Search All
+          Locations</a></li>
     {{else}}
       <li class="nav-item"><a href="/login" class="nav-link">Log In</a></li>
       <li class="nav-item"><a
