@@ -1,4 +1,4 @@
-/* Reset & Base */
+/*reset & base */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -14,7 +14,7 @@ body {
   flex-direction: column;
 }
 
-/* Navbar */
+/*navbar */
 .navbar {
   background-color: #2e7d52;
   padding: 0 32px;
@@ -56,7 +56,7 @@ body {
   color: #ffffff;
 }
 
-/* Page Content Wrapper */
+/*page content wrapper */
 .page-content {
   max-width: 860px;
   margin: 40px auto;
@@ -65,7 +65,7 @@ body {
   flex: 1;
 }
 
-/* Card */
+/*card */
 .card {
   background: #ffffff;
   border-radius: 8px;
@@ -74,7 +74,7 @@ body {
   margin-bottom: 24px;
 }
 
-/* Headings */
+/*headings */
 h1 {
   font-size: 1.8rem;
   margin-bottom: 16px;
@@ -87,7 +87,7 @@ h2 {
   color: #2e7d52;
 }
 
-/* Forms */
+/*forms */
 form {
   display: flex;
   flex-direction: column;
@@ -135,7 +135,7 @@ textarea {
   min-height: 90px;
 }
 
-/* Buttons */
+/*buttons */
 input[type="submit"],
 button,
 .btn {
@@ -179,7 +179,7 @@ input[type="submit"]:hover,
   background-color: #a93226;
 }
 
-/* Error List */
+/*error list */
 .errorList {
   list-style: none;
   margin-bottom: 16px;
@@ -196,7 +196,7 @@ input[type="submit"]:hover,
   font-size: 0.9rem;
 }
 
-/* Home Page */
+/*home page */
 .homeContent {
   max-width: 640px;
   line-height: 1.7;
@@ -207,7 +207,7 @@ input[type="submit"]:hover,
   margin-bottom: 12px;
 }
 
-/* Location / Review Cards */
+/*location/review cards */
 .location-card,
 .review-card {
   background: #fff;
@@ -239,7 +239,7 @@ input[type="submit"]:hover,
   margin-top: 6px;
 }
 
-/* Like / Dislike */
+/*like/dislike */
 .like-dislike {
   display: flex;
   gap: 12px;
@@ -251,7 +251,7 @@ input[type="submit"]:hover,
   font-size: 0.88rem;
 }
 
-/* Map */
+/*map */
 #map {
   height: 500px;
   width: 100%;
@@ -260,7 +260,7 @@ input[type="submit"]:hover,
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
-/* Admin Dashboard */
+/*admin dashboard */
 .report {
   background: #fff;
   border-left: 4px solid #e67e22;
@@ -275,7 +275,7 @@ input[type="submit"]:hover,
   font-size: 0.93rem;
 }
 
-/* Profile pic */
+/*profile pic */
 .originalProfilePic {
   width: 100px;
   height: 100px;
@@ -285,7 +285,7 @@ input[type="submit"]:hover,
   border: 3px solid #2e7d52;
 }
 
-/* Location page */
+/*location page */
 .location {
   line-height: 1.6;
 }
@@ -330,7 +330,7 @@ input[type="submit"]:hover,
   background-color: #e8f5ee;
 }
 
-/* Review */
+/*review */
 .review {
   border-top: 1px solid #e5e5e5;
   padding: 20px 0;
@@ -353,20 +353,20 @@ input[type="submit"]:hover,
   line-height: 1.6;
 }
 
-/* Comment */
+/*comment */
 .commentList {
   margin-top: 12px;
   padding-left: 16px;
   border-left: 3px solid #e8f5ee;
 }
 
-/* Error text (inline) */
+/*error text */
 .error {
   color: #b71c1c;
   font-size: 1rem;
 }
 
-/* Footer */
+/*footer*/
 footer {
   background-color: #2e7d52;
   color: #d9f0e4;
