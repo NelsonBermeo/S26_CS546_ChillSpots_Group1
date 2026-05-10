@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { users } from '../config/mongoCollections.js';
+import { users, locations, reviews } from '../config/mongoCollections.js';
 import { checkId } from '../validation.js';
 
 // all possible achievements and what triggers them
@@ -72,21 +72,21 @@ const checkVisitedAchievements = async (userId) => {
     if (visitCount >= 50) await giveAchievement(userId, 'Adventurer');
     if (visitCount >= 100) await giveAchievement(userId, 'ChillSpotter');
 
-    //checks for variety achievement visited spots with 5 different tags
-    //we need to look up the locations to get their tags
-    const { locations } = await import('../config/mongoCollections.js');
+    //checks for variety achievement: visited spots with 5 different tags
     const locationCollection = await locations();
-    const visitedLocations = await locationCollection.find({
-        _id: { $in: user.visited_locations_list }
-    }).toArray();
+    const visitedIds = user.visited_locations_list.map((id) => new ObjectId(id));
+    const visitedLocations = await locationCollection.find({ _id: { $in: visitedIds } }).toArray();
 
-    const tagsSeen = new Set();
-    for (const loc of visitedLocations) {
-        for (const tag of loc.tags) {
-            tagsSeen.add(tag);
+    const tagsSeen = [];
+    for (let i = 0; i < visitedLocations.length; i++) {
+        for (let j = 0; j < visitedLocations[i].tags.length; j++) {
+            const tag = visitedLocations[i].tags[j];
+            if (!tagsSeen.includes(tag)) {
+                tagsSeen.push(tag);
+            }
         }
     }
-    if (tagsSeen.size >= 5) await giveAchievement(userId, 'Jack of All Spots');
+    if (tagsSeen.length >= 5) await giveAchievement(userId, 'Jack of All Spots');
 };
 
 //calls this after a user posts a review
@@ -102,9 +102,14 @@ const checkReviewAchievements = async (userId) => {
     if (reviewCount >= 50) await giveAchievement(userId, 'Master Critic');
 };
 
-//calls this after a review gets a like, pass in the review object
-const checkReviewLikeAchievements = async (userId, reviewLikes) => {
-    userId = checkId(userId, 'userId');
+//calls this after a review gets a like, looks up the review to get owner and like count
+const checkReviewLikeAchievements = async (reviewId) => {
+    reviewId = checkId(reviewId, 'reviewId');
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
+    if (!review) throw 'Error: Review not found';
+    const userId = review.user_id.toString();
+    const reviewLikes = review.likes || 0;
     if (reviewLikes >= 10) await giveAchievement(userId, '1st Base');
     if (reviewLikes >= 50) await giveAchievement(userId, 'Goated');
     if (reviewLikes >= 100) await giveAchievement(userId, 'Superstar');
@@ -120,9 +125,14 @@ const checkLocationAchievements = async (userId) => {
     if (user.added_locations_list.length >= 1) await giveAchievement(userId, 'Scout');
 };
 
-//calls this after a location gets a like, pass in the location's poster userId and like count
-const checkLocationLikeAchievements = async (userId, locationLikes) => {
-    userId = checkId(userId, 'userId');
+//calls this after a location gets a like, looks up the location to get owner and like count
+const checkLocationLikeAchievements = async (locationId) => {
+    locationId = checkId(locationId, 'locationId');
+    const locationCollection = await locations();
+    const location = await locationCollection.findOne({ _id: new ObjectId(locationId) });
+    if (!location) throw 'Error: Location not found';
+    const userId = location.userId.toString();
+    const locationLikes = location.likes || 0;
     if (locationLikes >= 10) await giveAchievement(userId, 'On the come up');
     if (locationLikes >= 50) await giveAchievement(userId, 'W Larp');
 };
