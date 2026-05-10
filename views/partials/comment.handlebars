@@ -1,5 +1,14 @@
-<div class="comment">
+<div class="comment" data-comment-id="{{_id}}">
   <p class="commentAuthor">{{username}}</p>
   <p class="commentDate">{{date}}</p>
   <p class="commentContent">{{content}}</p>
+
+  <form class="reportForm" method="POST" action="/reports">
+    <input type="hidden" name="type" value="review">
+    <input type="hidden" name="item_id" value="{{_id}}">
+
+    <label for="commentReport-{{_id}}">Report this comment:</label>
+    <textarea id="commentReport-{{_id}}" name="content" maxlength="500"></textarea>
+    <button type="submit">Submit Report</button>
+  </form>
 </div>

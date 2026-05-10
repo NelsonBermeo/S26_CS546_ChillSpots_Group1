@@ -1,23 +1,27 @@
 {{!
-    Handlebars Variables:
-        title: title of page
-        body: body content in html
-        page_script: the file used as client side js (ex: form_validate.js)
+Handlebars Variables:
+title: title of page
+body: body content in html
+page_script: the file used as client side js (ex: form_validate.js)
 }}
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="/public/css/styles.css" />
-  </head>
-  <body>
-    {{{body}}}
-    {{#if page_script}}
-    <script src="{{page_script}}"></script>
-    {{else}}
-    <script src="/public/js/client.js"></script>
-    {{/if}}
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/public/css/styles.css" />
+</head>
+
+<body>
+  {{{body}}}
+  {{#if page_script}}
+  <script src="{{page_script}}"></script>
+  {{else}}
+  <script src="/public/js/client.js"></script>
+  {{/if}}
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+</body>
+
 </html>
