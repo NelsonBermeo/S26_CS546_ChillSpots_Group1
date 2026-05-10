@@ -6,11 +6,10 @@ import {addLocation, getLocationById, updateLocation, removeLocation, getAllLoca
 const db = await dbConnection()
 await db.dropDatabase()
 let testuser = undefined
-let testuser2 = undefined
 
 let testlocation = undefined
+
 let testreview = undefined
-let testreview2 = undefined
 
 // let allusers = undefined
 let locid = undefined
@@ -22,7 +21,7 @@ let revid = undefined
 let hideuser = 0
 
 try {
-  testuser = await addUser("nelson", "bermeo", "nellyb", "nelsonb@gmail.com", "Password123!", "profile_picture", "20")
+  testuser = await addUser("nelson", "bermeo", "nellyb", "nelsonb@gmail.com", "Password123!", "profile_picture", "20", )
   console.log(testuser)
 } catch (e) {
   console.log(e)
@@ -63,35 +62,33 @@ try {
 }
 }
 
-try {
-  testlocation = await addLocation(testuser, "Bernards Balls", "1st street", "12345", {lat: "90", lng: "140"}, ["park", "park"])
-  console.log(testlocation)
-} catch (e) {
-  console.log(e)
-}
+// try {
+//   testlocation = await addLocation(testuser, "Bernards Balls", "1st street", "12345", {lat: "90", lng: "140"}, ["park", "park"])
+//   console.log(testlocation)
+// } catch (e) {
+//   console.log(e)
+// }
 
-try {
-  testreview = await addReview(testuser, testlocation, "Wow Bernard's balls is so amazing and a wonderful place to visit!", "2")
-  console.log(testreview)
-} catch (e) {
-  console.log(e)
-}
+// try {
+//   testreview = await addReview(testuser, testlocation, "Wow Bernard's balls is so amazing and a wonderful place to visit!", "2")
+//   console.log(testreview)
+// } catch (e) {
+//   console.log(e)
+// }
 
-try {
-  revid = await removeReview(testreview, testuser)
-  console.log(revid)
-} catch (e) {
-  console.log(e)
-}
+// try {
+//   revid = await removeReview(testreview, testuser)
+//   console.log(revid)
+// } catch (e) {
+//   console.log(e)
+// }
 
-console.log("------------------Loc---------------------")
-
-try {
-  locid = await getLocationById(testlocation)
-  console.log(locid)
-} catch (e) {
-  console.log(e)
-}
+// try {
+//   locid = await getLocationById(testlocation)
+//   console.log(locid)
+// } catch (e) {
+//   console.log(e)
+// }
 
 
 // try {
