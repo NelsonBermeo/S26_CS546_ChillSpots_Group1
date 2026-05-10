@@ -152,20 +152,16 @@ const removeLocationFromList = async (listId, user_id, locationId) => {
   listId = checkId(listId, 'listId');
   user_id = checkId(user_id, 'user_id');
   locationId = checkId(locationId, 'locationId');
-
   const listCollection = await publicLists();
   const list = await listCollection.findOne({ _id: new ObjectId(listId) });
   if (!list) throw 'Error: List not found';
   if (list.user_id.toString() !== user_id) throw 'Error: You can only edit your own lists';
-
   const exists = list.location_list.some((id) => id.toString() === locationId);
   if (!exists) throw 'Error: Location is not in this list';
-
   await listCollection.updateOne(
     { _id: new ObjectId(listId) },
     { $pull: { location_list: new ObjectId(locationId) } }
   );
-
   return await getListById(listId);
 };
 
@@ -187,6 +183,21 @@ const removeList = async (listId, user_id) => {
   return { listId, deleted: true };
 };
 
+const getLocationsNotInList = async (listId) => {
+  listId = checkId(listId, 'listId');
+  const listCollection = await publicLists();
+  const list = await listCollection.findOne({ _id: new ObjectId(listId) });
+  if (!list) throw 'Error: List not found';
+  const locationCollection = await locations();
+  const available = await locationCollection
+    .find({ _id: { $nin: list.location_list } })
+    .toArray();
+  return available.map((loc) => {
+    loc._id = loc._id.toString();
+    return loc;
+  });
+};
+
 const _stringifyIds = (list) => {
   list._id = list._id.toString();
   list.user_id = list.user_id.toString();
@@ -202,6 +213,7 @@ export {
   updateList,
   addLocationToList,
   removeLocationFromList,
-  removeList
+  removeList,
+  getLocationsNotInList
 };
 
