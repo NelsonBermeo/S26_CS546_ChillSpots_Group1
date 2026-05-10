@@ -9,17 +9,10 @@
 <ul>
   {{#each reports}}
   <li class="report">
-    <p>Reason for Report: {{reason}}</p>
+    <p>Reporter: {{reporter}}</p>
     <p>Content in Reported {{type}}: {{content}}</p>
-    {{#if isLocation}}
-    <button onclick="deleteLocation({{id}})">Delete Location</button>
-    {{/if}}
-    {{#if isComment}}
-    <button onclick="deleteComment({{id}})">Delete Comment</button>
-    {{/if}}
-    {{#if isReview}}
-    <button onclick="deleteReview({{id}})">Delete Review</button>
-    {{/if}}
+    <button onclick="reportDeletionHandler('{{id}}')">Delete {{type}}</button>
   </li>
   {{/each}}
 </ul>
+<script src="../public/js/admin.js"></script>
