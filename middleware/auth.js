@@ -22,11 +22,11 @@ export const middleware = {
         }
         const memberState = req.session.member.role;
         if (memberState === "admin") {
-            res.redirect('/admin');
+            res.redirect('/admin/dashboard');
             return;
         }
         if (memberState === "user") {
-            res.redirect('/user');
+            res.redirect('/user/profile');
             return;
         }
 
@@ -40,11 +40,11 @@ export const middleware = {
         }
         const memberState = req.session.member.role;
         if (memberState === "admin") {
-            res.redirect('/admin');
+            res.redirect('/admin/dashboard');
             return;
         }
         if (memberState === "user") {
-            res.redirect('/user');
+            res.redirect('/user/profile');
             return;
         }
 
@@ -66,7 +66,7 @@ export const middleware = {
         }
         const memberState = req.session.member.role;
 
-        if (memberState === "member") {
+        if (memberState === "user") {
             res.status(403).redirect('/user');
             return;
         }

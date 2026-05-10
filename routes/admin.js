@@ -5,6 +5,7 @@ import * as reports from '../data/reports.js'
 import * as comments from '../data/comments.js'
 import * as reviews from '../data/reviews.js'
 import * as locations from '../data/locations.js'
+import { getUserById } from '../data/users.js';
 
 const router = Router();
 
@@ -29,28 +30,37 @@ router
             return;
         }
         if (req.session.member.role === "member") {
-            res.redirect('/user');
+            res.redirect('/user/profile');
             return;
         } else if (req.session.member.role === "admin") {
             try {
                 const reportData = await reports.getAllReports();
-                const reportList = reportData.map(e => ({
-                    type: e.type, 
-                    content: e.content,
-                    isLocation: (e.type === "location"),
-                    isComment: (e.type === "comment"),
-                    isReview: (e.type === "review"),
-                }));
+                const reportList = await Promise.all(
+                    reportData.map(async e => ({
+                        reporter: await ( async () => {
+                            try {
+                                const user = await getUserById(e.reporterId);
+                                return "" + user.email;
+                            } catch (e) { return "Unknown User, email could not be provided." }})(),
+                        id: e._id,
+                        type: e.type, 
+                        content: e.content
+                    })
+                ));
 
                 res.render('admindashboard', {
                     title: "Admin Dashboard",
+                    page_script: "../public/js/admin.js",
                     reports: reportList
                 })
             } catch (e) {
                 res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
             }
         } else { res.redirect('/'); return; }
-    })
+    });
+
+router
+    .route('/dashboard/:reportId')
     .delete(async (req, res) => {
         // This might need clientside js to directly inject the result into the delete method
         req.params.reportId = checkId(req.params.reportId, "Report ID");
@@ -67,6 +77,7 @@ router
             } catch (e) {
                 res.status(404).render('error', {title: "Error", error: e})
             }
+            break;
         case "comment":
             try {
                 const comment = await comments.getCommentById(report.item_id);
@@ -74,6 +85,7 @@ router
             } catch (e) {
                 res.status(404).render('error', {title: "Error", error: e})
             }
+            break;
         case "review":
             try {
                 const review = await reviews.getReviewById(report.item_id);
@@ -81,6 +93,7 @@ router
             } catch (e) {
                 res.status(404).render('error', {title: "Error", error: e})
             }
+            break;
         default:
             res.status(500).render('error', {title: "Error", error: `report type not found for: ${report.type}`})
         }
