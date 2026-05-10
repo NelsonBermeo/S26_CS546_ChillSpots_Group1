@@ -4,9 +4,9 @@
     <h1>{{list.name}}</h1>
     <p>Creator: {{list.username}}</p>
 
-    {{#if tags.length}}
+    {{#if list.tags.length}}
     <p>Tags:
-        {{#each tags}}
+        {{#each list.tags}}
         <span class="tag">{{this}}</span>
         {{/each}}
     </p>
@@ -24,8 +24,8 @@
     <section>
         <h2>Add a Location</h2>
         <form class="addLocationToListForm" method="POST" action="/publiclists/{{list._id}}/locations">
-            <label for="locationID">Choose a location:</label>
-            <select id="locationID" name="locationID">
+            <label for="locationId">Choose a location:</label>
+            <select id="locationId" name="locationId">
                 <option value="">Select a location</option>
                 {{#each notUsedLocations}}
                 <option value="{{_id}}">{{name}} - {{address}}</option>
@@ -42,7 +42,7 @@
         <ul>
             {{#each locations}}
             <li>
-                <a href="/locations/{{_id}}">{{name}}</a>
+                <a href="/location/{{_id}}">{{name}}</a>
                 <p>{{address}}</p>
 
                 {{#if ../editsAllowed}}

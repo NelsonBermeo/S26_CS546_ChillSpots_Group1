@@ -15,7 +15,7 @@
   {{#if pictures.length}}
     <div class="reviewPics">
     {{#each pictures}}
-    <img src="{{this}}" alt="Review photo" class="reviewPic"
+    <img src="{{this}}" alt="Review photo" class="reviewPic" />
     {{/each}}
     </div>
   {{/if}}
@@ -35,7 +35,7 @@
       <!-- Where the full link would be something like /reviews/locationId/comments/reviewId, but idrk -->
       <label for="commentText-{{_id}}">Write Your Comment:</label>
       <br>
-      <textarea id="commentText-{{_id}}" name="commentText" required minlength="1" maxlength="1000"></textarea>
+      <textarea id="commentText-{{_id}}" name="commentText" required minlength="1" maxlength="500"></textarea>
       <br>
       <button type="submit">Post Comment</button>
     </form>
