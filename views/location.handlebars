@@ -9,7 +9,7 @@
 
     {{#if images.length}}
     {{#each images}}
-    <img src="{{this}}" class="locationImage" />
+    <img src="{{this}}" class="locationImage" alt="Picture of {{../name}}" />
     {{/each}}
     {{else}}
     <p>No images for this location have been uploaded yet.</p>
@@ -47,16 +47,16 @@ for example url/questions, we will send the review to url/reviews/{{_id}} which 
         <textarea id="locationReportContent" name="content" maxlength="500"></textarea>
         <button type="submit">Submit Report</button>
     </form>
+    <h2>Reviews</h2>
     <form method="POST" id="reviewForm" action="/location/{{_id}}/reviews" enctype="multipart/form-data">
         <label id="reviewFormLabel">
             Write Your Review:</label>
         <br>
-        <textarea id="reviewTextInput" name="content" required minlength="1" maxlength="1000">
-        </textarea>
+        <textarea id="reviewTextInput" name="content" required minlength="1" maxlength="1000"></textarea>
         <br> <!-- This is the content of our review for req.body -->
-        <label for="reviewSafetyOption">Choose A Safety Rating:</label>
+        <label for="reviewSafetyRating">Choose A Safety Rating:</label>
         <br>
-        <select id="reviewSafetyOption" name="safetyRating">
+        <select id="reviewSafetyRating" name="safetyRating">
             <!-- This is the safetyRating of our review for req.body -->
             <option value="1">1: Dangerous</option>
             <option value="2">2</option>

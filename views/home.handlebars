@@ -5,11 +5,11 @@
         photos, leave reviews, and explore nearby restaurants and amenities,
         everything you need to plan the perfect, stress-free outing.
     </p>
-    <p>Use the navigation bar to either log in or register!</p>
     {{#if loggedIn}}
     <a href="/search">Find a ChillSpot</a>
     <a href="/location/new">Add a ChillSpot</a>
     {{else}}
+    <p>Log in or register to view locations, reviews, maps, lists, and profiles!</p>
     <a href="/login">Log In</a>
     <a href="/register">Register</a>
     {{/if}}
