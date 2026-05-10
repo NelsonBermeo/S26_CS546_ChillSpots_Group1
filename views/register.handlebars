@@ -3,51 +3,46 @@
         errors: array for errors that occur during registration
 }}
 {{> navbar}}
+<div class="page-content">
+  <div class="card">
+    <h1>Create an Account</h1>
+    <ul class="errorList" id="errors">
+      {{#if errors}}
+        {{#each errors}}
+          <li>{{this}}</li>
+        {{/each}}
+      {{/if}}
+    </ul>
+    <form id="register-form" name="register-form" method="POST">
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" name="firstName" />
 
-<ul class="errorList" id="errors">
-  {{#if errors}}
-    {{#each errors}}
-      <li>{{this}}</li>
-    {{/each}}
-  {{/if}}
-</ul>
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" name="lastName" />
 
-<form id="register-form" name="register-form" method="POST">
-  <label for="firstName">First Name: </label>
-  <input type="text" id="firstName" name="firstName" />
-  <br />
-  <label for="lastName">Last Name: </label>
-  <input type="text" id="lastName" name="lastName" />
-  <br />
-  <label for="username">Username: </label>
-  <input type="text" id="username" name="username" />
-  <br />
-  <label for="age">Username: </label>
-  <input type="number" id="age" name="age" min="0" max="120"/>
-  <br />
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" />
 
-  <label for="email">Email: </label>
-  <input type="email" id="email" name="email" />
-  <br />
-  <label for="password">Password: </label>
-  <input type="password" id="password" name="password" />
-  <br />
-  <label for="confirmPassword">Confirm Password: </label>
-  <input type="password" id="confirmPassword" name="confirmPassword" />
-  <br />
+      <label for="age">Age</label>
+      <input type="number" id="age" name="age" min="0" max="120" />
 
-  <label for="profilePic">Profile Picture: </label>
-  <input type="file" id="profilePic" name="profilePic" accept="image/*" />
-  <br />
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" />
 
-  <label for="adminSecret">Admin Secret (leave blank to remain a regular user): </label>
-  <input type="text" id="adminSecret" name="adminSecret"/>
-  <br />
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" />
 
-  <input
-    type="submit"
-    id="registerButton"
-    name="registerButton"
-    value="Register"
-  />
-</form>
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" />
+
+      <label for="profilePic">Profile Picture (optional)</label>
+      <input type="file" id="profilePic" name="profilePic" accept="image/*" />
+
+      <label for="adminSecret">Admin Secret (optional)</label>
+      <input type="text" id="adminSecret" name="adminSecret" />
+
+      <input type="submit" id="registerButton" name="registerButton" value="Register" />
+    </form>
+  </div>
+</div>
+{{> footer}}

@@ -1,31 +1,286 @@
-.navbar {
-  padding: 2px;
-  background-color: grey;
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f4f6f4;
+  color: #2d2d2d;
+  min-height: 100vh;
   display: flex;
-  color: white;
+  flex-direction: column;
 }
+
+/* Navbar */
+.navbar {
+  background-color: #2e7d52;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
 .app-name {
-  margin-left: 40px;
-  font-size: 30px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-decoration: none;
 }
+
 .nav-links {
   display: flex;
   list-style: none;
-  margin-left: 300px;
-  padding: 10px;
-  font-size: 20px;
+  margin-left: auto;
+  gap: 24px;
 }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+}
+
 .nav-link {
   text-decoration: none;
-  color: white;
+  color: #d9f0e4;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
 }
-.nav-item {
-  margin-right: 50px;
+
+.nav-link:hover {
+  color: #ffffff;
 }
-#map {
-  height: 600px;
+
+/* Page Content Wrapper */
+.page-content {
+  max-width: 860px;
+  margin: 40px auto;
+  padding: 0 20px;
   width: 100%;
-  border-radius: 5px;
-  margin-left: auto;
-  margin-right: auto;
+  flex: 1;
+}
+
+/* Card */
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+/* Headings */
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+  color: #1e5c3a;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: #2e7d52;
+}
+
+/* Forms */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 480px;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 2px;
+  display: block;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="file"],
+textarea,
+select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fafafa;
+  transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #2e7d52;
+  background: #fff;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* Buttons */
+input[type="submit"],
+button,
+.btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: fit-content;
+}
+
+input[type="submit"],
+.btn-primary {
+  background-color: #2e7d52;
+  color: #fff;
+}
+
+input[type="submit"]:hover,
+.btn-primary:hover {
+  background-color: #245f3f;
+}
+
+.btn-secondary {
+  background-color: #e8f5ee;
+  color: #2e7d52;
+  border: 1px solid #2e7d52;
+}
+
+.btn-secondary:hover {
+  background-color: #d0ebda;
+}
+
+.btn-danger {
+  background-color: #c0392b;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #a93226;
+}
+
+/* Error List */
+.errorList {
+  list-style: none;
+  margin-bottom: 16px;
+  max-width: 480px;
+}
+
+.errorList li {
+  background-color: #fdecea;
+  color: #b71c1c;
+  border-left: 4px solid #c0392b;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+/* Home Page */
+.homeContent {
+  max-width: 640px;
+  line-height: 1.7;
+  color: #444;
+}
+
+.homeContent p {
+  margin-bottom: 12px;
+}
+
+/* Location / Review Cards */
+.location-card,
+.review-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.location-card h2,
+.review-card h2 {
+  margin-bottom: 6px;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #e8f5ee;
+  color: #2e7d52;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin: 3px 2px;
+}
+
+.rating {
+  font-size: 0.88rem;
+  color: #666;
+  margin-top: 6px;
+}
+
+/* Like / Dislike */
+.like-dislike {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.like-dislike button {
+  padding: 6px 16px;
+  font-size: 0.88rem;
+}
+
+/* Map */
+#map {
+  height: 500px;
+  width: 100%;
+  border-radius: 8px;
+  margin: 20px 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Admin Dashboard */
+.report {
+  background: #fff;
+  border-left: 4px solid #e67e22;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.report p {
+  margin-bottom: 8px;
+  font-size: 0.93rem;
+}
+
+/* Footer */
+footer {
+  background-color: #2e7d52;
+  color: #d9f0e4;
+  text-align: center;
+  padding: 16px;
+  font-size: 0.85rem;
+  margin-top: auto;
 }
