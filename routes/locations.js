@@ -16,12 +16,14 @@ import {
   getAllLocations,
   getLocationsByTag,
   getLocationsByName,
-  getLocationsByZip
+  getLocationsByZip,
+  toggleLocationLike,
+  toggleLocationDislike
 } from '../data/locations.js';
 
 import {addReview} from '../data/reviews.js';
 import * as reports from '../data/reports.js';
-import { checkReviewAchievements, checkLocationAchievements } from '../data/achievements.js';
+import { checkReviewAchievements, checkLocationAchievements, checkLocationLikeAchievements } from '../data/achievements.js';
 
 const router = Router();
 
@@ -244,35 +246,50 @@ router.get('/api/map', async (req, res) => {
   }
 });
 
-//temporarily blocks location like functionality until data support exists
+//toggles like on a location for the logged-in user
 router.post('/:id/like', middleware.getuser, async (req, res) => {
   try {
     const locationId = checkId(req.params.id, 'locationId');
+    const userId = checkId(req.session.member._id, 'userId');
 
-    return notImplemented(
-      res,
-      'Requires location like implementation in data/locations.js.'
-    );
+    const reaction = await toggleLocationLike(locationId, userId);
+
+    try {
+      await checkLocationLikeAchievements(locationId);
+    } catch (e) {
+    }
+
+    return res.json({
+      success: true,
+      likes: reaction.likes,
+      dislikes: reaction.dislikes,
+      userLiked: reaction.userLiked
+    });
   } catch (e) {
-    return res.status(400).render('error', {
-      title: 'Location Like Error',
+    return res.status(400).json({
+      success: false,
       error: e.toString()
     });
   }
 });
 
-//temporarily blocks location dislike functionality until data support exists
+//toggles dislike on a location for the logged-in user
 router.post('/:id/dislike', middleware.getuser, async (req, res) => {
   try {
     const locationId = checkId(req.params.id, 'locationId');
+    const userId = checkId(req.session.member._id, 'userId');
 
-    return notImplemented(
-      res,
-      'Requires location dislike implementation in data/locations.js.'
-    );
+    const reaction = await toggleLocationDislike(locationId, userId);
+
+    return res.json({
+      success: true,
+      likes: reaction.likes,
+      dislikes: reaction.dislikes,
+      userDisliked: reaction.userDisliked
+    });
   } catch (e) {
-    return res.status(400).render('error', {
-      title: 'Location Dislike Error',
+    return res.status(400).json({
+      success: false,
       error: e.toString()
     });
   }

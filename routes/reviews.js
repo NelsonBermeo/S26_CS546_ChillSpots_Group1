@@ -3,6 +3,8 @@ import xss from 'xss';
 import {checkId, checkString, check_length} from '../validation.js';
 import {middleware} from '../middleware/auth.js';
 import * as reports from '../data/reports.js';
+import {toggleReviewLike, toggleReviewDislike} from '../data/reviews.js';
+import {checkReviewLikeAchievements} from '../data/achievements.js';
 
 const router = Router();
 
@@ -44,21 +46,19 @@ router.post('/:id/like', middleware.getuser, async (req, res) => {
     const reviewId = checkId(req.params.id, 'reviewId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    return notImplementedJson(
-      res,
-      'Requires toggleReviewLike(reviewId, userId) implementation in data/reviews.js.'
-    );
-
-    /*
     const reaction = await toggleReviewLike(reviewId, userId);
+
+    try {
+      await checkReviewLikeAchievements(reviewId);
+    } catch (e) {
+    }
 
     return res.json({
       success: true,
       likes: reaction.likes,
       dislikes: reaction.dislikes,
-      userReaction: reaction.userReaction
+      userLiked: reaction.userLiked
     });
-    */
   } catch (e) {
     return res.status(400).json({
       success: false,
@@ -73,21 +73,14 @@ router.post('/:id/dislike', middleware.getuser, async (req, res) => {
     const reviewId = checkId(req.params.id, 'reviewId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    return notImplementedJson(
-      res,
-      'Requires toggleReviewDislike(reviewId, userId) implementation in data/reviews.js.'
-    );
-
-    /*
     const reaction = await toggleReviewDislike(reviewId, userId);
 
     return res.json({
       success: true,
       likes: reaction.likes,
       dislikes: reaction.dislikes,
-      userReaction: reaction.userReaction
+      userDisliked: reaction.userDisliked
     });
-    */
   } catch (e) {
     return res.status(400).json({
       success: false,
