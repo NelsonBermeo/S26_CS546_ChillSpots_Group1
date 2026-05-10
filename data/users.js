@@ -1,7 +1,7 @@
 import {users} from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
-import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "../validation.js"
+import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range, validate } from "../validation.js"
 /*
 
 The user object schema:
@@ -76,7 +76,8 @@ const addUser = async (
     profile_picture, 
     // achievements, Gets added whenever they do things
     // added_locations_list, Gets added whenever they create their own location
-    age
+    age,
+    admin_key
 ) => {
     first_name = checkString(first_name)
     last_name = checkString(last_name)
@@ -85,6 +86,7 @@ const addUser = async (
     password = checkString(password)
     // profile_picture = checkString(profile_picture)
     age = checkNumericString(age)
+    const role = validate.admin_key(admin_key);
 
     first_name = first_name.toLowerCase()
     check_length(first_name, 1, 50)
@@ -160,7 +162,7 @@ const addUser = async (
         "achievements" : [],
         "added_locations_list" : [],
         "age" : parsedAge,
-        "role" : "user"
+        "role" : role
     }
 
     const insertInfo = await userCollection.insertOne(newUser)
