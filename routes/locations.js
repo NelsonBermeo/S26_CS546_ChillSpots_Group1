@@ -30,7 +30,7 @@ TODO:
 -location.handlebars form action should be /location/{{_id}}/reviews
 -location.handlebars report form action should be /location/{{_id}}/reports
 -I took a look at data/locations.js, it still needs a few additions/fixes:
-  -addLocation sets lat from coordinates.lng instead of coordinates.lat
+  -addLocation seems to set lat from coordinates.lng instead of coordinates.lat
   -average_saftey_rating is misspelled
 -data/reviews.js now exports addReview, but it still needs duplicate-review prevention so one user cannot review the same location multiple times
 -data/reviews.js needs getReviewsByLocationId(locationId) so location detail pages can render full review objects
