@@ -137,7 +137,9 @@ router.get('/map', async (req, res) => {
 
     return res.render('map', {
       title: 'Location Map',
-      locations
+      locations,
+      loggedIn: true,
+      isAdmin: req.session.member.role === 'admin'
     });
   } catch (e) {
     return res.status(400).render('error', {
@@ -151,7 +153,9 @@ router.get('/map', async (req, res) => {
 router.get('/new', middleware.getuser, async (req, res) => {
   try {
     return res.render('newLocation', {
-      title: 'Add Location'
+      title: 'Add Location',
+      loggedIn: true,
+      isAdmin: req.session.member.role === 'admin'
     });
   } catch (e) {
     return res.status(400).render('error', {
