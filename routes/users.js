@@ -1,24 +1,25 @@
 import {Router} from 'express';
 import xss from 'xss';
 import {checkId, checkString, check_length} from '../validation.js';
-import { getUserById } from '../data/users.js';
+import {middleware} from '../middleware/auth.js';
+import {getUserById} from '../data/users.js';
+
 const router = Router();
 
 /*
 TODO:
--middleware/auth.js needs to be completed in order to finalize this route
--users.js data code needs to be fully implemented before these routes can fully function (looks like it doenst export anything right now)
-For now, I will assume these functions will be eventually implemented in some form:
-- getUserFriends(userId)
-- getUserPublicLists(userId)
-- getUserVisitedLocations(userId)
-- addFriend(userId, friendId)
-- createUserList(userId, listName, description)
-
-Each part of that future implementation is commented out for now so they can be added later once ready
+-auth/login must store req.session.member._id because this file uses current middleware/auth.js session setup
+-routes/index.js currently mounts this at /user, so redirects should use /user/profile unless the mount is changed to /users
+-profile.handlebars may expect top-level fields, while getUserById returns fields like first_name, last_name, profile_picture
+-data/users.js still needs:
+  - getUserFriends(userId)
+  - getUserPublicLists(userId)
+  - getUserVisitedLocations(userId)
+  - addFriend(userId, friendId)
+  - createUserList(userId, listName, description)
 */
 
-//helper function so unfinished routes will display error instead of simply crashing
+//renders a temporary "Not Implemented" error page for unfinished route functionality
 const notImplemented = (res, todo) => {
   return res.status(501).render('error', {
     title: 'Not yet Implemented',
@@ -27,24 +28,24 @@ const notImplemented = (res, todo) => {
 };
 
 //renders the currently logged-in user's profile page
-router.get('/profile', async (req, res) => {
+router.get('/profile', middleware.getuser, async (req, res) => {
   try {
-    /*
-    TODO:
-    Add middleware aspects once that file is implemented
-    */
-
-    if (!req.session || !req.session.user) {
-      return res.redirect('/login');
-    }
-
-    const userId = checkId(req.session.user._id, 'userId');
-
+    const userId = checkId(req.session.member._id, 'userId');
     const user = await getUserById(userId);
 
     return res.render('profile', {
       title: 'My Profile',
-      user
+      user,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      username: user.username,
+      email: user.email,
+      profilePic: user.profile_picture,
+      reviews: user.reviews || [],
+      friends: user.friends_list || [],
+      visited: user.visited_locations_list || [],
+      lists: user.public_lists || [],
+      achievements: user.achievements || []
     });
   } catch (e) {
     return res.status(400).render('error', {
@@ -55,18 +56,9 @@ router.get('/profile', async (req, res) => {
 });
 
 //adds another user to the currently logged-in user's friends list
-router.post('/profile/friends', async (req, res) => {
+router.post('/profile/friends', middleware.getuser, async (req, res) => {
   try {
-    /*
-    TODO:
-    Add middleware aspects once that file is implemented
-    */
-
-    if (!req.session || !req.session.user) {
-      return res.redirect('/login');
-    }
-
-    const userId = checkId(req.session.user._id, 'userId');
+    const userId = checkId(req.session.member._id, 'userId');
     const friendId = checkId(req.body.friendId, 'friendId');
 
     if (userId === friendId) {
@@ -84,7 +76,7 @@ router.post('/profile/friends', async (req, res) => {
     /*
     await addFriend(userId, friendId);
 
-    return res.redirect('/users/profile');
+    return res.redirect('/user/profile');
     */
   } catch (e) {
     return res.status(400).render('error', {
@@ -95,39 +87,24 @@ router.post('/profile/friends', async (req, res) => {
 });
 
 //creates a new public list for the currently logged-in user
-router.post('/profile/lists', async (req, res) => {
+router.post('/profile/lists', middleware.getuser, async (req, res) => {
   try {
-    /*
-    TODO:
-    Add middleware aspects once that file is implemented
-    */
+    const userId = checkId(req.session.member._id, 'userId');
 
-    if (!req.session || !req.session.user) {
-      return res.redirect('/login');
-    }
-
-    const userId = checkId(req.session.user._id, 'userId');
-
-    const listName = checkString(
-      xss(req.body.listName),
-      'listName'
-    );
-
+    const listName = checkString(xss(req.body.listName), 'listName');
     check_length(listName, 1, 100);
 
     let description = '';
 
-    if (
-      req.body.description !== undefined &&
-      req.body.description !== null &&
-      req.body.description.trim() !== ''
-    ) {
-      description = checkString(
-        xss(req.body.description),
-        'description'
-      );
+    if (req.body.description !== undefined && req.body.description !== null) {
+      if (typeof req.body.description !== 'string') {
+        throw 'Error: description must be a string';
+      }
 
-      check_length(description, 1, 500);
+      if (req.body.description.trim() !== '') {
+        description = checkString(xss(req.body.description), 'description');
+        check_length(description, 1, 500);
+      }
     }
 
     return notImplemented(
@@ -138,7 +115,7 @@ router.post('/profile/lists', async (req, res) => {
     /*
     await createUserList(userId, listName, description);
 
-    return res.redirect('/users/profile');
+    return res.redirect('/user/profile');
     */
   } catch (e) {
     return res.status(400).render('error', {
@@ -176,7 +153,7 @@ router.get('/:id/friends', async (req, res) => {
   }
 });
 
-//displays the public/custom lists belonging to a specific user 
+//displays the public/custom lists belonging to a specific user
 router.get('/:id/lists', async (req, res) => {
   try {
     const userId = checkId(req.params.id, 'userId');
@@ -236,12 +213,20 @@ router.get('/:id/visited', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const userId = checkId(req.params.id, 'userId');
-
     const user = await getUserById(userId);
 
     return res.render('profile', {
       title: `${user.username}'s Profile`,
-      user
+      user,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      username: user.username,
+      profilePic: user.profile_picture,
+      reviews: user.reviews || [],
+      friends: user.friends_list || [],
+      visited: user.visited_locations_list || [],
+      lists: user.public_lists || [],
+      achievements: user.achievements || []
     });
   } catch (e) {
     return res.status(400).render('error', {

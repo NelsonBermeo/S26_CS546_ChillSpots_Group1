@@ -1,25 +1,28 @@
 import {Router} from 'express';
 import xss from 'xss';
-import { checkId,checkString, check_length} from '../validation.js';
+import {checkId, checkString, check_length} from '../validation.js';
+import {middleware} from '../middleware/auth.js';
+import * as reports from '../data/reports.js';
+
 const router = Router();
 
 /*
 TODO:
--middleware/auth.js needs to be completed in order to finalize this route
--I also looked at reviews data, and in its current state it still needs a few fixes before this can fully work
-
-Assumed future review data functions:
-- toggleReviewLike(reviewId, userId)
-- toggleReviewDislike(reviewId, userId)
-- createReviewReport(reviewId, userId, username, reason)
-
-Comments functionality is intentionally being kept separate for now in comments.js, but I might merge it with this later
+-auth/login must store req.session.member._id because this file uses current middleware/auth.js session setup
+-data/reviews.js still needs reaction helpers:
+  - toggleReviewLike(reviewId, userId)
+  - toggleReviewDislike(reviewId, userId)
+-data/reviews.js currently stores reaction counts only, so duplicate prevention needs likedBy/dislikedBy arrays or another tracking method
+-comments functionality is intentionally being kept separate for now in comments.js
+-data/comments.js import/mounting still needs to be fixed before comments can work
 */
 
-//helper function to detect whether the request expects a JSON response
-const wantsJson = (req) => { return req.xhr || req.get('accept')?.includes('application/json'); };
+//checks whether the request expects a JSON response instead of a rendered page
+const wantsJson = (req) => {
+  return req.xhr || req.get('accept')?.includes('application/json');
+};
 
-//helper function so unfinished AJAX routes return a JSON error instead of crashing
+//returns a temporary JSON error response for unfinished AJAX/API functionality
 const notImplementedJson = (res, todo) => {
   return res.status(501).json({
     success: false,
@@ -27,42 +30,11 @@ const notImplementedJson = (res, todo) => {
   });
 };
 
-//helper function so unfinished form/page routes render an error page instead of crashing
-const notImplementedRender = (res, todo) => {
-  return res.status(501).render('error', {
-    title: 'Not Implemented',
-    error: todo
-  });
-};
-
 //adds a like reaction to a review
-router.post('/:id/like', async (req, res) => {
+router.post('/:id/like', middleware.getuser, async (req, res) => {
   try {
-    /*
-    TODO:
-    Add requireAuth middleware once implemented.
-    */
-
-    if (!req.session || !req.session.user) {
-      return res.status(401).json({
-        success: false,
-        error: 'You must be logged in.'
-      });
-    }
-
     const reviewId = checkId(req.params.id, 'reviewId');
-    const userId = checkId(req.session.user._id, 'userId');
-
-    /*
-    TODO:
-    Requires toggleReviewLike(reviewId, userId).
-
-    This function should:
-    - validate review exists
-    - prevent duplicate likes from same user
-    - remove user's dislike first if one exists
-    - return updated likes/dislikes counts
-    */
+    const userId = checkId(req.session.member._id, 'userId');
 
     return notImplementedJson(
       res,
@@ -88,33 +60,10 @@ router.post('/:id/like', async (req, res) => {
 });
 
 //adds a dislike reaction to a review
-router.post('/:id/dislike', async (req, res) => {
+router.post('/:id/dislike', middleware.getuser, async (req, res) => {
   try {
-    /*
-    TODO:
-    Add requireAuth middleware once implemented.
-    */
-
-    if (!req.session || !req.session.user) {
-      return res.status(401).json({
-        success: false,
-        error: 'You must be logged in.'
-      });
-    }
-
     const reviewId = checkId(req.params.id, 'reviewId');
-    const userId = checkId(req.session.user._id, 'userId');
-
-    /*
-    TODO:
-    Requires toggleReviewDislike(reviewId, userId).
-
-    This function should:
-    - validate review exists
-    - prevent duplicate dislikes from same user
-    - remove user's like first if one exists
-    - return updated likes/dislikes counts
-    */
+    const userId = checkId(req.session.member._id, 'userId');
 
     return notImplementedJson(
       res,
@@ -139,57 +88,18 @@ router.post('/:id/dislike', async (req, res) => {
   }
 });
 
-//creates a moderation/admin report against a review
-router.post('/:id/reports', async (req, res) => {
+//submits a report against a review for moderation/admin review
+router.post('/:id/reports', middleware.getuser, async (req, res) => {
   try {
-    /*
-    TODO:
-    Add requireAuth middleware once implemented.
-    */
-
-    if (!req.session || !req.session.user) {
-      return res.redirect('/login');
-    }
-
     const reviewId = checkId(req.params.id, 'reviewId');
-    const userId = checkId(req.session.user._id, 'userId');
+    const userId = checkId(req.session.member._id, 'userId');
 
-    const reason = checkString(
-      xss(req.body.reason),
-      'reason'
-    );
-
+    const reason = checkString(xss(req.body.reason), 'reason');
     check_length(reason, 5, 500);
 
-    /*
-    TODO:
-    Better long-term location may be data/reports.js instead of data/reviews.js.
+    await reports.addReport(userId, reviewId, 'review', reason);
 
-    Requires createReviewReport(reviewId, userId, username, reason).
-
-    This function should:
-    - validate review exists
-    - create report document with type "review"
-    - store item_id as reviewId
-    - store reporter info
-    - optionally prevent duplicate reports from same user
-    */
-
-    return notImplementedRender(
-      res,
-      'Requires createReviewReport(reviewId, userId, username, reason) implementation in data/reviews.js or data/reports.js.'
-    );
-
-    /*
-    await createReviewReport(
-      reviewId,
-      userId,
-      req.session.user.username,
-      reason
-    );
-
-    return res.redirect(req.get('Referrer') || `/reviews/${reviewId}`);
-    */
+    return res.redirect(req.get('Referrer') || '/');
   } catch (e) {
     if (wantsJson(req)) {
       return res.status(400).json({
