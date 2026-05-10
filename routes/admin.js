@@ -51,7 +51,9 @@ router
                 res.render('admindashboard', {
                     title: "Admin Dashboard",
                     page_script: "../public/js/admin.js",
-                    reports: reportList
+                    reports: reportList,
+                    loggedIn: true,
+                    isAdmin: true
                 })
             } catch (e) {
                 res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
