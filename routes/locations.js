@@ -18,12 +18,15 @@ import {
   getLocationsByName,
   getLocationsByZip,
   toggleLocationLike,
-  toggleLocationDislike
+  toggleLocationDislike,
+  getLocationByFilters
 } from '../data/locations.js';
 
 import {addReview} from '../data/reviews.js';
 import * as reports from '../data/reports.js';
 import { checkReviewAchievements, checkLocationAchievements, checkLocationLikeAchievements } from '../data/achievements.js';
+
+import { queryFilteredLocs } from '../utils/helpers.js';
 
 const router = Router();
 
@@ -69,40 +72,64 @@ router
   .route('/')
   .get(async (req, res) => {
     try {
-      /*
-      TODO:
-      A dedicated locations list/search view should eventually be created.
-      The current location.handlebars file is a detail page, not a browse page.
-      */
-
-      return notImplemented(
-        res,
-        'Requires a dedicated locations browse/search view.'
-      );
-
-      /*
-      let locations = [];
-
-      if (req.query.name) {
-        const name = checkString(xss(req.query.name), 'name');
-        locations = await getLocationsByName(name);
-      } else if (req.query.zipcode) {
-        const zipcode = checkNumericString(xss(req.query.zipcode), 'zipcode');
-        locations = await getLocationsByZip(zipcode);
-      } else if (req.query.tags) {
-        const tags = parseTags(req.query.tags);
-        locations = await getLocationsByTag(tags);
-      } else {
-        locations = await getAllLocations();
+      if (!req.session.member) {
+        res.status(403).redirect('..');
+        return;
       }
 
-      return res.render('locations', {
-        title: 'Locations',
-        locations,
-        loggedIn: true,
-        isAdmin: req.session.member.role === 'admin'
-      });
-      */
+      let likes = undefined; 
+      if (req.query.likes === "true") {
+        likes = true;
+      } else if (req.query.likes === "false") {
+        likes = false;
+      } 
+      
+      let friend_visited = undefined;
+      if (req.query.friend_visited === "true") {
+        friend_visited = true;
+      } else if (req.query.friend_visited === "false") {
+        friend_visited = false;
+      } 
+      
+      const zip = req.query.zip || null;
+      
+      const name = req.query.loc_name || null;
+      
+      let tags = req.query.tags || null;
+      if (tags && typeof tags === "string") {
+        tags = tags.split(",").map(t => t.trim());
+      }
+      try {
+        const locations = await getLocationByFilters(
+        req.session.member._id,
+        likes,
+        friend_visited,
+        zip,
+          name,
+          tags
+        );
+
+        res.render('location', { 
+          title: "ChillSpots - Search Locations",
+          locations,
+          query: req.query.loc_name || "",
+          zip: req.query.zip || "",
+          tags : req.query.tags || "",
+          loggedIn: true,
+          isAdmin: req.session.member.role === 'admin'
+        });
+      } catch (err) {
+        res.status(400).render('location', { 
+          title: "ChillSpots - Search Locations",
+          error: err,
+          locations: undefined,
+          query: req.query.loc_name || "",
+          zip: req.query.zip || "",
+          tags : req.query.tags || "",
+          loggedIn: true,
+          isAdmin: req.session.member.role === 'admin'
+        });
+      }
     } catch (e) {
       return res.status(400).render('error', {
         title: 'Locations Error',
@@ -164,7 +191,9 @@ router.get('/map', async (req, res) => {
 
     return res.render('map', {
       title: 'Location Map',
-      locations
+      locations,
+      loggedIn: true,
+      isAdmin: req.session.member.role === 'admin'
     });
   } catch (e) {
     return res.status(400).render('error', {
@@ -178,7 +207,9 @@ router.get('/map', async (req, res) => {
 router.get('/new', middleware.getuser, async (req, res) => {
   try {
     return res.render('newLocation', {
-      title: 'Add Location'
+      title: 'Add Location',
+      loggedIn: true,
+      isAdmin: req.session.member.role === 'admin'
     });
   } catch (e) {
     return res.status(400).render('error', {

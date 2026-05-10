@@ -10,7 +10,14 @@ const upload = multer({dest: 'uploads/'});
 
 router.route('/').get(async (req, res) => {
     try {
-        res.render('home', {title: "ChillSpots - Home"});
+        if (req.session.member) res.render('home', {
+            title: "ChillSpots - Home",
+            loggedIn: true,
+            isAdmin: req.session.member.role === 'admin'
+        });
+        else res.render('home', {
+            title: "ChillSpots - Home"
+        });
     } catch (e) {
         return res.status(500).json({error : e});
     }
