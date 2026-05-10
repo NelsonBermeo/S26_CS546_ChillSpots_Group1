@@ -24,7 +24,11 @@ import {
 
 import {addReview} from '../data/reviews.js';
 import * as reports from '../data/reports.js';
-import { checkReviewAchievements, checkLocationAchievements, checkLocationLikeAchievements } from '../data/achievements.js';
+import {
+  checkReviewAchievements,
+  checkLocationAchievements,
+  checkLocationLikeAchievements
+} from '../data/achievements.js';
 
 import { queryFilteredLocs } from '../utils/helpers.js';
 
@@ -70,7 +74,7 @@ const parseTags = (rawTags) => {
 //renders the main locations browse/search page
 router
   .route('/')
-  .get(async (req, res) => {
+  .get(middleware.getuser, async (req, res) => {
     try {
       if (!req.session.member) {
         res.status(403).redirect('..');
@@ -185,7 +189,7 @@ router
   });
 
 //renders the map page for locations
-router.get('/map', async (req, res) => {
+router.get('/map', middleware.getuser, async (req, res) => {
   try {
     const locations = await getAllLocations();
 
@@ -220,7 +224,7 @@ router.get('/new', middleware.getuser, async (req, res) => {
 });
 
 //returns location search results as JSON for AJAX/client-side search
-router.get('/api/search', async (req, res) => {
+router.get('/api/search', middleware.getuser, async (req, res) => {
   try {
     let locations = [];
 
@@ -250,7 +254,7 @@ router.get('/api/search', async (req, res) => {
 });
 
 //returns location marker data as JSON for the map
-router.get('/api/map', async (req, res) => {
+router.get('/api/map', middleware.getuser, async (req, res) => {
   try {
     const locations = await getAllLocations();
 
