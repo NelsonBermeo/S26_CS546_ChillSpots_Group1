@@ -7,8 +7,8 @@ email
 profilePic
 }}
 {{> navbar}}
-<div class="page-content">
-  <div class="card">
+<main class="profileContent">
+  <section class="editProfileSecion">
     <h1>Edit Profile</h1>
   <form id="profileForm" method="POST" action="/user/profile" enctype="multipart/form-data">
     <label for="firstName">First Name: </label>
@@ -36,14 +36,62 @@ profilePic
     <br />
 
     <div class="currentProfilePic">
-      <img id="profilePic" class="originalProfilePic" src="{{profilePic}}" />
+      <img id="profilePic" class="originalProfilePic" src="{{profilePic}}" alt="{{username}} profile picture"/>
     </div>
     <label for="newProfilePic">Update Profile Picture: </label>
-    <input type="file" id="newProfilePic" name="newProfilePic" accept="image/*" />
+    <input type="file" id="newProfilePic" name="newProfilePic" accept="image/png,image/jpeg,image/webp" />
     <br />
 
     <button type="submit" class="btn-primary">Update Profile</button>
   </form>
-  </div>
-</div>
+  </section>
+  <section>
+    <h2>Vistied Locations</h2>
+    {{#if visited.length}}
+    <ul>
+      {{#each visited}}
+        <li><a href="/location/{{this}}">{{this}}</a></li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p>No locations visited yet.</p>
+    {{/if}}
+  </section>
+  <section>
+    <h2>Friends</h2>
+    {{#if friends.length}}
+      <ul>
+      {{#each friends}}
+        <li>{{this}}</li>
+      {{/each}}
+      </ul>
+    {{else}}
+    <p>No friends yet.</p>
+    {{/if}}
+  </section>
+  <section>
+    <h2>Public Lists</h2>
+    {{#if lists.length}}
+    <ul>
+      {{#each lists}}
+        <li><a href="/publiclists/{{this}}">{{this}}</a></li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p>No locations visited yet.</p>
+    {{/if}}
+  </section>
+  <section>
+    <h2>Achievements</h2>
+    {{#if achievements.length}}
+      <ul>
+      {{#each achievements}}
+        <li>{{this}}</li>
+      {{/each}}
+      </ul>
+    {{else}}
+    <p>No achievements yet.</p>
+    {{/if}}
+  </section>
+</main>
 {{> footer}}
