@@ -155,7 +155,7 @@ router
             req.body[key] = xss(req.body[key]);
         }
         let fieldsToNotPresent = {
-            username:    !req.body.username, //! SHOULD BE CALLED EMAIL. USING USERNAME FOR TESTING PURPOSES
+            email:    !req.body.email, 
             password: !req.body.password,
         }
         let fieldsNotPresent = Object.entries(fieldsToNotPresent).filter(([key, value]) => value).map(e => e[0]);
@@ -172,7 +172,7 @@ router
         }
         let errors = [];
         try {
-            validate.email(req.body.username, "Username");
+            validate.email(req.body.email, "Email");
         } catch (e) {
             req.body.username = null;
             errors.push(e);
@@ -190,7 +190,7 @@ router
             })
         }
         try {
-            const userData = await checkUser(req.body.username, req.body.password); //! SHOULD BE EMAIL
+            const userData = await checkUser(req.body.email, req.body.password); 
             req.session.member = {
                 first_name: userData.first_name,
                 last_name: userData.last_name,
