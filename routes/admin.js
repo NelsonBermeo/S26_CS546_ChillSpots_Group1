@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import xss from 'xss';
-import { validate } from '../validation.js';
+import { validate, checkId } from '../validation.js';
 import * as reports from '../data/reports.js'
+import * as comments from '../data/comments.js'
 
 const router = Router();
 
@@ -48,8 +49,11 @@ router
             }
         } else { res.redirect('/'); return; }
     })
-    .post(async (req, res) => {
+    .delete(async (req, res) => {
+        req.params.reportId = checkId(req.params.reportId, "Report ID");
+        const report = reports.getReportById(req.params.reportId);
 
+        // const comment = comments.getCommentById(report.);
     })
 
 export default router;
