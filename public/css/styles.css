@@ -310,3 +310,13 @@ footer {
   padding: 15px;
   margin-top: 40px;
 }
+
+footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+
+footer li {
+  margin: 2px 0;
+}
