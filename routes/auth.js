@@ -191,16 +191,12 @@ router
         }
         try {
             const userData = await checkUser(req.body.email, req.body.password); 
-            req.session.member = {
-                first_name: userData.first_name,
-                last_name: userData.last_name,
-                role: userData.role
-            };
+            req.session.member = userData;
 
             if (userData.role === "admin") {
                 res.redirect("/admin/dashboard");
             } else if (userData.role === "user") {
-                res.redirect("/user")
+                res.redirect("/user/profile")
             }
         } catch (e) {
             res.status(500).render("error", {title: "Error", error: `Internal Server Error Occured: ${e}`})
