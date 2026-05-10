@@ -16,6 +16,7 @@ TODO:
   - getUserVisitedLocations(userId)
   - addFriend(userId, friendId)
   - createUserList(userId, listName, description)
+  - updateUser profile handling if POST /profile becomes functional
 */
 
 //renders a temporary "Not Implemented" error page for unfinished route functionality
@@ -57,6 +58,36 @@ router.get('/profile', middleware.getuser, async (req, res) => {
       title: 'My Profile',
       ...profileUser
     });
+  } catch (e) {
+    return res.status(400).render('error', {
+      title: 'Error',
+      error: e.toString()
+    });
+  }
+});
+
+//updates the currently logged-in user's profile information
+router.post('/profile', middleware.getuser, async (req, res) => {
+  try {
+    const userId = checkId(req.session.member._id, 'userId');
+
+    return notImplemented(
+      res,
+      'Requires updateUser profile form handling implementation in data/users.js.'
+    );
+
+    /*
+    const firstName = req.body.firstName ? checkString(xss(req.body.firstName), 'firstName') : undefined;
+    const lastName = req.body.lastName ? checkString(xss(req.body.lastName), 'lastName') : undefined;
+    const username = req.body.username ? checkString(xss(req.body.username), 'username') : undefined;
+    const email = req.body.email ? checkString(xss(req.body.email), 'email') : undefined;
+    const profilePic = req.body.profilePic ? xss(req.body.profilePic) : undefined;
+    const age = req.body.age;
+
+    await updateUser(userId, firstName, lastName, username, email, profilePic, age);
+
+    return res.redirect('/user/profile');
+    */
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Error',

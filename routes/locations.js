@@ -35,6 +35,7 @@ TODO:
 -data/reviews.js now exports addReview, but it still needs duplicate-review prevention so one user cannot review the same location multiple times
 -data/reviews.js needs getReviewsByLocationId(locationId) so location detail pages can render full review objects
 -data/users.js or data/locations.js needs markLocationVisited(userId, locationId)
+-location like/dislike links exist in the view, but data functions/routes for location reactions are not implemented yet
 */
 
 //renders a temporary "Not Implemented" error page for unfinished route functionality
@@ -65,6 +66,18 @@ router
   .route('/')
   .get(async (req, res) => {
     try {
+      /*
+      TODO:
+      A dedicated locations list/search view should eventually be created.
+      The current location.handlebars file is a detail page, not a browse page.
+      */
+
+      return notImplemented(
+        res,
+        'Requires a dedicated locations browse/search view.'
+      );
+
+      /*
       let locations = [];
 
       if (req.query.name) {
@@ -80,10 +93,11 @@ router
         locations = await getAllLocations();
       }
 
-      return res.render('location', {
+      return res.render('locations', {
         title: 'Locations',
         locations
       });
+      */
     } catch (e) {
       return res.status(400).render('error', {
         title: 'Locations Error',
@@ -222,16 +236,58 @@ router.get('/api/map', async (req, res) => {
   }
 });
 
+//temporarily blocks location like functionality until data support exists
+router.post('/:id/like', middleware.getuser, async (req, res) => {
+  try {
+    const locationId = checkId(req.params.id, 'locationId');
+
+    return notImplemented(
+      res,
+      'Requires location like implementation in data/locations.js.'
+    );
+  } catch (e) {
+    return res.status(400).render('error', {
+      title: 'Location Like Error',
+      error: e.toString()
+    });
+  }
+});
+
+//temporarily blocks location dislike functionality until data support exists
+router.post('/:id/dislike', middleware.getuser, async (req, res) => {
+  try {
+    const locationId = checkId(req.params.id, 'locationId');
+
+    return notImplemented(
+      res,
+      'Requires location dislike implementation in data/locations.js.'
+    );
+  } catch (e) {
+    return res.status(400).render('error', {
+      title: 'Location Dislike Error',
+      error: e.toString()
+    });
+  }
+});
+
 //renders the edit form for a location
 router.get('/:id/edit', middleware.getuser, async (req, res) => {
   try {
     const locationId = checkId(req.params.id, 'locationId');
+
+    return notImplemented(
+      res,
+      'Requires views/editLocation.handlebars before this route can render an edit form.'
+    );
+
+    /*
     const location = await getLocationById(locationId);
 
     return res.render('editLocation', {
       title: 'Edit Location',
       location
     });
+    */
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Edit Location Error',
@@ -331,7 +387,8 @@ router.post('/:id/reports', middleware.getuser, async (req, res) => {
     const locationId = checkId(req.params.id, 'locationId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    const content = checkString(xss(req.body.content), 'content');
+    const rawContent = req.body.content || req.body.reason;
+    const content = checkString(xss(rawContent), 'content');
     check_length(content, 5, 500);
 
     await reports.addReport(userId, locationId, 'location', content);
