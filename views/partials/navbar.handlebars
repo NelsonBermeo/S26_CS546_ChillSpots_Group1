@@ -1,22 +1,24 @@
 {{!
-    Handlebars Variables:
-        
+Handlebars Variables:
+
 }}
 <nav class="navbar">
   <div class="app-name">ChillSpots</div>
   <ul class="nav-links">
     <li class="nav-item"><a href="/home" class="nav-link">Home</a></li>
     {{#if loggedIn}}
-      <li class="nav-item"><a href="/profile" class="nav-link">Profile</a></li>
-      <li class="nav-item"><a href="/signout" class="nav-link">Sign Out</a></li>
-      <li class="nav-item"><a href="/search" class="nav-link">Search All
-          Locations</a></li>
+    <li class="nav-item"><a href="/user/profile" class="nav-link">Profile</a></li>
+    <li class="nav-item"><a href="/signout" class="nav-link">Sign Out</a></li>
+    <li class="nav-item"><a href="/search" class="nav-link">Search All
+        Locations</a></li>
+    <li class="nav-item"><a href="/location/map" class="nav-link">Map</a></li>
+    <li class="nav-item"><a href="/publiclists" class="nav-link">Public Lists</a></li>
+    {{#if isAdmin}}
+    <li class="nav-item"><a href="/admin/dashboard" class="nav-link">Admin Dashboard</a></li>
+    {{/if}}
     {{else}}
-      <li class="nav-item"><a href="/login" class="nav-link">Log In</a></li>
-      <li class="nav-item"><a
-          href="/register"
-          class="nav-link"
-        >Register</a></li>
+    <li class="nav-item"><a href="/login" class="nav-link">Log In</a></li>
+    <li class="nav-item"><a href="/register" class="nav-link">Register</a></li>
     {{/if}}
   </ul>
 </nav>

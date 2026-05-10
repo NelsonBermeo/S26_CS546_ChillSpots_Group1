@@ -4,20 +4,22 @@
         each report has: id, content, type, reason
         isLocation, isComment, isReview,
 -->
+{{> navbar}}
+
 <ul>
   {{#each reports}}
-    <li class="report">
-      <p>Reason for Report: {{reason}}</p>
-      <p>Content in Reported {{type}}: {{content}}</p>
-      {{#if isLocation}}
-        <button onclick="deleteLocation({{id}})">Delete Location</button>
-      {{/if}}
-      {{#if isComment}}
-        <button onclick="deleteComment({{id}})">Delete Comment</button>
-      {{/if}}
-      {{#if isReview}}
-        <button onclick="deleteReview({{id}})">Delete Review</button>
-      {{/if}}
-    </li>
+  <li class="report">
+    <p>Reason for Report: {{reason}}</p>
+    <p>Content in Reported {{type}}: {{content}}</p>
+    {{#if isLocation}}
+    <button onclick="deleteLocation({{id}})">Delete Location</button>
+    {{/if}}
+    {{#if isComment}}
+    <button onclick="deleteComment({{id}})">Delete Comment</button>
+    {{/if}}
+    {{#if isReview}}
+    <button onclick="deleteReview({{id}})">Delete Review</button>
+    {{/if}}
+  </li>
   {{/each}}
 </ul>
