@@ -22,10 +22,14 @@
             <p>Likes: <span class="locationLikes">{{likes}}</span></p>
             <p>Dislikes: <span class="locationDislikes">{{dislikes}}</span></p>
 
-            <a href="/location/{{_id}}/like" class="likeLocation" data-id="{{_id}}">Like</a>
-            <a href="/location/{{_id}}/dislike" class="dislikeLocation" data-id="{{_id}}">Dislike</a>
-        </div>
-        <p class="locAvgSafety">Average Safety Rating: {{average_safety_rating}}</p>
+        <form method="POST" action="/location/{{_id}}/like">
+            <button type="submit">Like</button>
+        </form>
+        <form method="POST" action="/location/{{_id}}/dislike">
+            <button type="submit">Dislike</button>
+        </form>
+    </div>
+    <p class="locAvgSafety">Average Safety Rating: {{average_safety_rating}}</p>
 
         {{#if tags.length}}
         <p>

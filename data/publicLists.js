@@ -68,7 +68,12 @@ const getListById = async (listId) => {
   const listCollection = await publicLists();
   const list = await listCollection.findOne({ _id: new ObjectId(listId) });
   if (!list) throw 'Error: List not found';
-  return _stringifyIds(list);
+  list._id = list._id.toString();
+  list.user_id = list.user_id.toString();
+  for (let i = 0; i < list.location_list.length; i++) {
+    list.location_list[i] = list.location_list[i].toString();
+  }
+  return list;
 };
 
 const getListsByUserId = async (user_id) => {
@@ -77,16 +82,28 @@ const getListsByUserId = async (user_id) => {
   const user = await userCollection.findOne({ _id: new ObjectId(user_id) });
   if (!user) throw 'Error: User not found';
   const listCollection = await publicLists();
-  const userLists = await listCollection
-    .find({ user_id: new ObjectId(user_id) })
-    .toArray();
-  return userLists.map(_stringifyIds);
+  const userLists = await listCollection.find({ user_id: new ObjectId(user_id) }).toArray();
+  for (let i = 0; i < userLists.length; i++) {
+    userLists[i]._id = userLists[i]._id.toString();
+    userLists[i].user_id = userLists[i].user_id.toString();
+    for (let j = 0; j < userLists[i].location_list.length; j++) {
+      userLists[i].location_list[j] = userLists[i].location_list[j].toString();
+    }
+  }
+  return userLists;
 };
 
 const getAllLists = async () => {
   const listCollection = await publicLists();
   const allLists = await listCollection.find({}).toArray();
-  return allLists.map(_stringifyIds);
+  for (let i = 0; i < allLists.length; i++) {
+    allLists[i]._id = allLists[i]._id.toString();
+    allLists[i].user_id = allLists[i].user_id.toString();
+    for (let j = 0; j < allLists[i].location_list.length; j++) {
+      allLists[i].location_list[j] = allLists[i].location_list[j].toString();
+    }
+  }
+  return allLists;
 };
 
 const updateList = async (listId, user_id, updates) => {
@@ -121,7 +138,12 @@ const updateList = async (listId, user_id, updates) => {
     { returnDocument: 'after' }
   );
   if (!updateInfo) throw 'Error: Could not update list';
-  return _stringifyIds(updateInfo);
+  updateInfo._id = updateInfo._id.toString();
+  updateInfo.user_id = updateInfo.user_id.toString();
+  for (let i = 0; i < updateInfo.location_list.length; i++) {
+    updateInfo.location_list[i] = updateInfo.location_list[i].toString();
+  }
+  return updateInfo;
 };
 
 const addLocationToList = async (listId, user_id, locationId) => {
@@ -137,9 +159,12 @@ const addLocationToList = async (listId, user_id, locationId) => {
   const location = await locationCollection.findOne({ _id: new ObjectId(locationId) });
   if (!location) throw 'Error: Location not found';
   //checks not already in list
-  const alreadyIn = list.location_list.some(
-    (id) => id.toString() === locationId
-  );
+  let alreadyIn = false;
+  for (let i = 0; i < list.location_list.length; i++) {
+    if (list.location_list[i].toString() === locationId) {
+      alreadyIn = true;
+    }
+  }
   if (alreadyIn) throw 'Error: Location is already in this list';
   await listCollection.updateOne(
     { _id: new ObjectId(listId) },
@@ -156,7 +181,12 @@ const removeLocationFromList = async (listId, user_id, locationId) => {
   const list = await listCollection.findOne({ _id: new ObjectId(listId) });
   if (!list) throw 'Error: List not found';
   if (list.user_id.toString() !== user_id) throw 'Error: You can only edit your own lists';
-  const exists = list.location_list.some((id) => id.toString() === locationId);
+  let exists = false;
+  for (let i = 0; i < list.location_list.length; i++) {
+    if (list.location_list[i].toString() === locationId) {
+      exists = true;
+    }
+  }
   if (!exists) throw 'Error: Location is not in this list';
   await listCollection.updateOne(
     { _id: new ObjectId(listId) },
@@ -196,13 +226,6 @@ const getLocationsNotInList = async (listId) => {
     loc._id = loc._id.toString();
     return loc;
   });
-};
-
-const _stringifyIds = (list) => {
-  list._id = list._id.toString();
-  list.user_id = list.user_id.toString();
-  list.location_list = list.location_list.map((id) => id.toString());
-  return list;
 };
 
 export {

@@ -456,4 +456,77 @@ const getLocationByFilters = async (userId, likes, friend_visited, zip, name, ta
 }
 
 
-export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByMostLikes, getLocationByFilters}
+const toggleLocationLike = async (locationId, userId) => {
+    locationId = checkId(locationId)
+    userId = checkId(userId)
+    const locationCollection = await locations()
+    const location = await locationCollection.findOne({ _id: new ObjectId(locationId) })
+    if (!location) throw "Error: Location not found"
+
+    // if user already liked it, remove the like (toggle off)
+    const alreadyLiked = location.likedBy && location.likedBy.includes(userId)
+    if (alreadyLiked) {
+        await locationCollection.updateOne(
+            { _id: new ObjectId(locationId) },
+            { $inc: { likes: -1 }, $pull: { likedBy: userId } }
+        )
+    } else {
+        // remove dislike first if they had disliked
+        const alreadyDisliked = location.dislikedBy && location.dislikedBy.includes(userId)
+        if (alreadyDisliked) {
+            await locationCollection.updateOne(
+                { _id: new ObjectId(locationId) },
+                { $inc: { dislikes: -1 }, $pull: { dislikedBy: userId } }
+            )
+        }
+        await locationCollection.updateOne(
+            { _id: new ObjectId(locationId) },
+            { $inc: { likes: 1 }, $push: { likedBy: userId } }
+        )
+    }
+
+    const updated = await locationCollection.findOne({ _id: new ObjectId(locationId) })
+    return {
+        likes: updated.likes,
+        dislikes: updated.dislikes,
+        userLiked: !alreadyLiked
+    }
+}
+
+const toggleLocationDislike = async (locationId, userId) => {
+    locationId = checkId(locationId)
+    userId = checkId(userId)
+    const locationCollection = await locations()
+    const location = await locationCollection.findOne({ _id: new ObjectId(locationId) })
+    if (!location) throw "Error: Location not found"
+
+    const alreadyDisliked = location.dislikedBy && location.dislikedBy.includes(userId)
+    if (alreadyDisliked) {
+        await locationCollection.updateOne(
+            { _id: new ObjectId(locationId) },
+            { $inc: { dislikes: -1 }, $pull: { dislikedBy: userId } }
+        )
+    } else {
+        // remove like first if they had liked
+        const alreadyLiked = location.likedBy && location.likedBy.includes(userId)
+        if (alreadyLiked) {
+            await locationCollection.updateOne(
+                { _id: new ObjectId(locationId) },
+                { $inc: { likes: -1 }, $pull: { likedBy: userId } }
+            )
+        }
+        await locationCollection.updateOne(
+            { _id: new ObjectId(locationId) },
+            { $inc: { dislikes: 1 }, $push: { dislikedBy: userId } }
+        )
+    }
+
+    const updated = await locationCollection.findOne({ _id: new ObjectId(locationId) })
+    return {
+        likes: updated.likes,
+        dislikes: updated.dislikes,
+        userDisliked: !alreadyDisliked
+    }
+}
+
+export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByMostLikes, getLocationByFilters, toggleLocationLike, toggleLocationDislike}

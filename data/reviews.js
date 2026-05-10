@@ -229,4 +229,78 @@ const removeReview = async (reviewId, userId) => {
 
 
 
-export {removeReview, updateReview, getAllReviews, getReviewById, addReview}
+const toggleReviewLike = async (reviewId, userId) => {
+    reviewId = checkId(reviewId, 'reviewId');
+    userId = checkId(userId, 'userId');
+
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
+    if (!review) throw 'Error: Review not found';
+
+    const likedBy = review.likedBy || [];
+    const dislikedBy = review.dislikedBy || [];
+
+    if (likedBy.includes(userId)) {
+        await reviewCollection.updateOne(
+            { _id: new ObjectId(reviewId) },
+            { $pull: { likedBy: userId }, $inc: { likes: -1 } }
+        );
+    } else {
+        if (dislikedBy.includes(userId)) {
+            await reviewCollection.updateOne(
+                { _id: new ObjectId(reviewId) },
+                { $pull: { dislikedBy: userId }, $inc: { disikes: -1 } }
+            );
+        }
+        await reviewCollection.updateOne(
+            { _id: new ObjectId(reviewId) },
+            { $push: { likedBy: userId }, $inc: { likes: 1 } }
+        );
+    }
+
+    const updated = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
+    return {
+        likes: updated.likes || 0,
+        dislikes: updated.disikes || 0,
+        userLiked: (updated.likedBy || []).includes(userId)
+    };
+};
+
+const toggleReviewDislike = async (reviewId, userId) => {
+    reviewId = checkId(reviewId, 'reviewId');
+    userId = checkId(userId, 'userId');
+
+    const reviewCollection = await reviews();
+    const review = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
+    if (!review) throw 'Error: Review not found';
+
+    const likedBy = review.likedBy || [];
+    const dislikedBy = review.dislikedBy || [];
+
+    if (dislikedBy.includes(userId)) {
+        await reviewCollection.updateOne(
+            { _id: new ObjectId(reviewId) },
+            { $pull: { dislikedBy: userId }, $inc: { disikes: -1 } }
+        );
+    } else {
+        if (likedBy.includes(userId)) {
+            await reviewCollection.updateOne(
+                { _id: new ObjectId(reviewId) },
+                { $pull: { likedBy: userId }, $inc: { likes: -1 } }
+            );
+        }
+        await reviewCollection.updateOne(
+            { _id: new ObjectId(reviewId) },
+            { $push: { dislikedBy: userId }, $inc: { disikes: 1 } }
+        );
+    }
+
+    const updated = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
+    return {
+        likes: updated.likes || 0,
+        dislikes: updated.disikes || 0,
+        userDisliked: (updated.dislikedBy || []).includes(userId)
+    };
+};
+
+export {removeReview, updateReview, getAllReviews, getReviewById, addReview, toggleReviewLike, toggleReviewDislike}

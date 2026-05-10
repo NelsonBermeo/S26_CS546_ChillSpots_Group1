@@ -3,6 +3,8 @@ import xss from 'xss';
 import {checkId, checkString, check_length} from '../validation.js';
 import {middleware} from '../middleware/auth.js';
 import * as reports from '../data/reports.js';
+import {toggleReviewLike, toggleReviewDislike} from '../data/reviews.js';
+import {checkReviewLikeAchievements} from '../data/achievements.js';
 
 const router = Router();
 
@@ -19,7 +21,8 @@ TODO:
 
 //checks whether the request expects a JSON response instead of a rendered page
 const wantsJson = (req) => {
-  return req.xhr || req.get('accept')?.includes('application/json');
+  const accept = req.get('accept') || '';
+  return req.xhr || accept.includes('application/json');
 };
 
 //returns a temporary JSON error response for unfinished AJAX/API functionality
@@ -44,24 +47,17 @@ router.post('/:id/like', middleware.getuser, async (req, res) => {
     const reviewId = checkId(req.params.id, 'reviewId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    return notImplementedJson(
-      res,
-      'Requires toggleReviewLike(reviewId, userId) implementation in data/reviews.js.'
-    );
+    await toggleReviewLike(reviewId, userId);
 
-    /*
-    const reaction = await toggleReviewLike(reviewId, userId);
+    try {
+      await checkReviewLikeAchievements(reviewId);
+    } catch (e) {
+    }
 
-    return res.json({
-      success: true,
-      likes: reaction.likes,
-      dislikes: reaction.dislikes,
-      userReaction: reaction.userReaction
-    });
-    */
+    return res.redirect(req.get('Referrer') || '/');
   } catch (e) {
-    return res.status(400).json({
-      success: false,
+    return res.status(400).render('error', {
+      title: 'Review Like Error',
       error: e.toString()
     });
   }
@@ -73,24 +69,12 @@ router.post('/:id/dislike', middleware.getuser, async (req, res) => {
     const reviewId = checkId(req.params.id, 'reviewId');
     const userId = checkId(req.session.member._id, 'userId');
 
-    return notImplementedJson(
-      res,
-      'Requires toggleReviewDislike(reviewId, userId) implementation in data/reviews.js.'
-    );
+    await toggleReviewDislike(reviewId, userId);
 
-    /*
-    const reaction = await toggleReviewDislike(reviewId, userId);
-
-    return res.json({
-      success: true,
-      likes: reaction.likes,
-      dislikes: reaction.dislikes,
-      userReaction: reaction.userReaction
-    });
-    */
+    return res.redirect(req.get('Referrer') || '/');
   } catch (e) {
-    return res.status(400).json({
-      success: false,
+    return res.status(400).render('error', {
+      title: 'Review Dislike Error',
       error: e.toString()
     });
   }
