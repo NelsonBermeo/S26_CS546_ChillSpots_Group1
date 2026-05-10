@@ -1,0 +1,61 @@
+{{> navbar}}
+
+<main>
+    <h1>{{list.name}}</h1>
+    <p>Creator: {{list.username}}</p>
+
+    {{#if tags.length}}
+    <p>Tags:
+        {{#each tags}}
+        <span class="tag">{{this}}</span>
+        {{/each}}
+    </p>
+    {{/if}}
+    <p>Number of locations: {{locations.length}}</p>
+    {{#if editsAllowed}}
+    <form id="editPublicListForm" method="POST" action="/publiclists/{{list._id}}/edit">
+        <label for="listName">List Name: </label>
+        <input type="text" id="listName" name="listName" value="{{list.name}}" /><br>
+
+        <input type="submit" value="Edit This List" id="editPublicList" />
+    </form>
+    {{/if}}
+    {{#if editsAllowed}}
+    <section>
+        <h2>Add a Location</h2>
+        <form class="addLocationToListForm" method="POST" action="/publiclists/{{list._id}}/locations">
+            <label for="locationID">Choose a location:</label>
+            <select id="locationID" name="locationID">
+                <option value="">Select a location</option>
+                {{#each notUsedLocations}}
+                <option value="{{_id}}">{{name}} - {{address}}</option>
+                {{/each}}
+            </select>
+            <input type="submit" value="Add Location" id="addLocationToPublicList" />
+        </form>
+    </section>
+    {{/if}}
+    <section>
+        <h2>Locations in this List</h2>
+
+        {{#if locations.length}}
+        <ul>
+            {{#each locations}}
+            <li>
+                <a href="/locations/{{_id}}">{{name}}</a>
+                <p>{{address}}</p>
+
+                {{#if ../editsAllowed}}
+                <form class="deleteLocationFromListForm" method="POST"
+                    action="/publiclists/{{../list._id}}/locations/{{_id}}/remove">
+                    <input type="submit" value="Remove From List" class="removeLocFromList" />
+                </form>
+                {{/if}}
+            </li>
+            {{/each}}
+        </ul>
+        {{else}}
+        <p>This list has no locations currently.</p>
+        {{/if}}
+    </section>
+</main>

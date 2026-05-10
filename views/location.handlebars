@@ -1,36 +1,84 @@
+{{> navbar}}
 <main class="location">
-  <p class="locAddress">{{address}}</p>
-  {{#each images}}
-    <img src="{{link}}" class="locationImage" />
-  {{/each}}
-  <p class="locLikes">{{likes}}</p>
-  <p class="locDislikes">{{dislikes}}</p>
-  <p class="locAvgSafety">{{average_safety_rating}}</p>
-<!-- Below we have our form to post a review followed by all the reviews -->
-<!-- Something to keep in mind is that our input's need names. Express reads fields from req.body using name -->
-<!-- Also, action, as stated in the slideshow: "signifies where the form will be submitted to" -> After some googling I realized that this meant to what URL:
+    <h1>{{name}}</h1>
+    <p class="locAddress">{{address}}</p>
+    <p>ZIP Code: {{zipcode}}</p>
+    {{#if coordinates}}
+    <p>Coordinates: {{coordinates.lat}}, {{coordinates.lng}}</p>
+    {{/if}}
+
+    {{#if images.length}}
+    {{#each images}}
+    <img src="{{this}}" class="locationImage" />
+    {{/each}}
+    {{else}}
+    <p>No images for this location have been uploaded yet.</p>
+    {{/if}}
+
+    <div class="locationReactions" data-id="{{_id}}">
+        <p>Likes: <span class="locationLikes">{{likes}}</span></p>
+        <p>Dislikes: <span class="locationDislikes">{{dislikes}}</span></p>
+
+        <a href="/location/{{_id}}/like" class="likeLocation" data-id="{{_id}}">Like</a>
+        <a href="/location/{{_id}}/dislike" class="dislikeLocation" data-id="{{_id}}">Dislike</a>
+    </div>
+    <p class="locAvgSafety">Average Safety Rating: {{average_safety_rating}}</p>
+
+    {{#if tags.length}}
+    <p>
+        Tags:
+        {{#each tags}}
+        <span class="tag">{{this}}</span>
+        {{/each}}
+    </p>
+    {{/if}}
+    <!-- Below we have our form to post a review followed by all the reviews -->
+    <!-- Something to keep in mind is that our input's need names. Express reads fields from req.body using name -->
+    <!-- Also, action, as stated in the slideshow: "signifies where the form will be submitted to" -> After some googling I realized that this meant to what URL:
 for example url/questions, we will send the review to url/reviews/{{_id}} which is the id of the location we are currently viewing -->
-<form method="POST" id="reviewForm" action="/review/{{_id}}">
-    <label id="reviewFormLabel">
-      Write Your Review:</label>
-      <br>
-    <textarea id="reviewTextInput" name="content" required minlength="1" maxlength="1000"> 
-    </textarea>
-    <br> <!-- This is the content of our review for req.body -->
-    <label id="reviewSafetyOption">Choose A Safety Rating:</label>
-    <br>
-    <select id="reviewSafetyOption" name="safetyRating"> <!-- This is the safetyRating of our review for req.body -->
-    <option value="1">1: Dangerous</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5: Very Safe</option>
-    </select>
-    <br>
-    <button type="submit">Post Review</button>
+    <form class="visitedForm" method="POST" action="/location/{{_id}}/visited">
+        <button type="submit">Mark As Visited</button>
     </form>
-<!-- Below we have all the reviews -->
-  {{#each reviews}}
-    {{> review this}}
-  {{/each}}
+    <form class="reportForm" method="POST" action="/reports">
+        <input type="hidden" name="type" value="location">
+        <input type="hidden" name="item_id" value="{{_id}}">
+
+        <label for="locationReportContent">Report this location:</label>
+        <textarea id="locationReportContent" name="content" maxlength="500"></textarea>
+        <button type="submit">Submit Report</button>
+    </form>
+    <form method="POST" id="reviewForm" action="/location/{{_id}}/reviews" enctype="multipart/form-data">
+        <label id="reviewFormLabel">
+            Write Your Review:</label>
+        <br>
+        <textarea id="reviewTextInput" name="content" required minlength="1" maxlength="1000">
+        </textarea>
+        <br> <!-- This is the content of our review for req.body -->
+        <label for="reviewSafetyOption">Choose A Safety Rating:</label>
+        <br>
+        <select id="reviewSafetyOption" name="safetyRating">
+            <!-- This is the safetyRating of our review for req.body -->
+            <option value="1">1: Dangerous</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5: Very Safe</option>
+        </select>
+        <br>
+        <label for="reviewPics">Location Pictures: </label>
+        <input type="file" id="reviewPics" name="reviewPics" accept="image/jpeg,image/png,image/webp" multiple />
+        <br />
+        <br>
+        <button type="submit">Post Review</button>
+    </form>
+    <!-- Below we have all the reviews -->
+    <section>
+        {{#if reviews.length}}
+        {{#each reviews}}
+        {{> review this}}
+        {{/each}}
+        {{else}}
+        <p>There are currently no reviews for this location.</p>
+        {{/if}}
+    </section>
 </main>

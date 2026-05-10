@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
 import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "../validation.js"
+import {removeReview, updateReview, getAllReviews, getReviewById, addReview} from '../data/reviews.js'
 import {users, locations} from '../config/mongoCollections.js';
 
 
@@ -64,7 +65,7 @@ const addLocation = async (
     zipcode, // Since many addresses are similar we need a zipcode to differentiate them
     coordinates, // we can store these as a dict
     // poster, we only need the user id not the username
-    // pictures, ADD BACK IN
+    pictures, //ADD BACK IN
     // reviews, we dont add reviews here 
     // likes, we dont add lkes her e
     // dislikes, we dont add dislikes here 
@@ -127,8 +128,18 @@ const addLocation = async (
     if (!coordinates.lng){
         throw "Coordinates must contain longitude"
     }
-    checkNumericString(coordinates.lat)
-    checkNumericString(coordinates.lng)
+    // checkNumericString(coordinates.lat)
+    // checkNumericString(coordinates.lng)
+    const coordinateRegex = /^-?\d+(\.\d+)?$/
+
+    if (!coordinateRegex.test(coordinates.lat)) {
+        throw "Error: latitude must be a valid coordinate"
+    }
+
+    if (!coordinateRegex.test(coordinates.lng)) {
+        throw "Error: longitude must be a valid coordinate"
+    }
+    
 
     let lat = Number(coordinates.lng)
     let long = Number(coordinates.lng)
@@ -150,6 +161,13 @@ const addLocation = async (
     // }
 
     //tags 
+    if (!Array.isArray(pictures)){
+        throw "Error: Pictures must be an array."
+    } 
+    for (let i = 0; i < pictures.length; i++) { 
+        pictures[i] = checkString(pictures[i]);
+        check_length(pictures[i], 1, 1000)
+    }   
 
     if (!Array.isArray(tags)) throw "Error: Tags must be an array"
     tags = tags.filter((item, index) => tags.indexOf(item) === index);
@@ -168,7 +186,7 @@ const addLocation = async (
         "address": address,
         "zipcode": zipcode,
         "coordinates": { "lat": lat, "lng": long}, 
-        "pictures": [],
+        "pictures": pictures,
         "reviews": [],
         "likes": 0,
         "dislikes": 0,
@@ -249,7 +267,34 @@ const updateLocation = async (locationid,
 } 
 
 const removeLocation = async (locationId) => {
-//...
+    locationId = checkId(locationId)
+    const locationCollection = await locations()
+    const reviewCollection = await reviews()
+    const userCollection = await users()
+    const location = await locationCollection.findOne({
+        _id: new ObjectId(locationId)
+    })
+    if (!location) throw "Error: Location not found"
+    if (location.reviews.length !== 0){
+        for (let review of location.reviews){
+            let rev = await getReviewById(review)
+            await removeReview(review, rev.userId)
+        }
+    }
+    await userCollection.updateMany({},{ $pull: { added_locations_list: locationId } })
+    await userCollection.updateMany({},{ $pull: { visited_locations_list: locationId } })
+    const deleteInfo = await locationCollection.deleteOne({
+        _id: new ObjectId(locationId)
+    })
+    if (deleteInfo.deletedCount === 0) {
+        throw "Error: Could not delete location"
+    }
+
+    return {
+        locationId: locationId,
+        deleted: true
+    };
+
 }
 
 const getAllLocations = async () => {
@@ -320,4 +365,95 @@ const getLocationsByNameAndTags = async (nameinput, tags) => { //maybe this it t
     return union 
 }
 
-export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip}
+const getLocationByMostLikes = async () => {
+    const locationCollection = await locations()
+    const locationList = await locationCollection.find({}).sort({ likes: -1 }).toArray()
+    return locationList
+}
+
+const getLocationByFilters = async (userId, likes, friend_visited, zip, name, tags) => {
+    userId = checkId(userId)
+    const locationCollection = await locations()
+    const userCollection = await users()
+    let user = await userCollection.findOne({ _id : new ObjectId(userId) })
+    if (!user){
+        throw "Error: User ID does not exist"
+    }
+    let filters = {}
+    if (likes !== undefined && likes !== null) { 
+        if (typeof likes !== 'boolean') {
+            throw "Error: Likes must be a boolean"
+        }
+    }
+    if (friend_visited !== undefined && friend_visited !== null){
+        if (typeof friend_visited !== 'boolean') {
+            throw "Error: Friends visited must be a boolean"
+        }
+    } 
+    if (zip){
+        zip = checkNumericString(zip)
+        check_length(zip, 5, 5)
+        filters.zipcode = zip
+    }
+    if (name){
+        name = checkString(name) 
+        check_length(name, 1, 100)
+        const locationNameRegex = /^[A-Za-z0-9 .'-]+$/;
+        if (!locationNameRegex.test(name)) { 
+            throw "Error: Name is no correct" 
+        }
+        filters.name = {$regex: name, $options: "i" } //contains name & case insens
+    }
+    if (tags){
+        if (!Array.isArray(tags)) throw "Error: Tags must be an array"
+        tags = tags.filter((item, index) => tags.indexOf(item) === index);
+        if (tags.length > 10) throw "Error: A location can have at most 10 tags"
+        for (let i = 0; i < tags.length; i++){
+            tags[i] = checkString(tags[i])
+            check_length(tags[i], 1, 10)
+            if (!allowedTags.includes(tags[i])){
+                throw "Error: Tag is not allowed"
+            }
+        }
+        filters.tags = {$all: tags} //check if the locaiton tags has tags
+
+    }
+    let locationList = await locationCollection.find(filters).toArray()
+    if (friend_visited === true) {
+
+        let friendIds = [] 
+        if (user.friends_list.length !== 0){
+            friendIds = user.friends_list
+        }
+        let friendObjectIds = friendIds.map((id) => new ObjectId(id))
+
+        let friends = await userCollection.find({ _id: { $in: friendObjectIds }}).toArray();
+
+        let visitedLocationIds = [];
+
+        for (let friend of friends) {
+            if (friend.visited_locations_list) {
+                for (let loc of friend.visited_locations_list){
+                    visitedLocationIds.push(loc.toString()) 
+                }
+            }
+        }
+        visitedLocationIds = visitedLocationIds.filter((item, index) => visitedLocationIds.indexOf(item) === index)
+
+        locationList = locationList.filter((location) => { //filters the final list to have only friend ones
+            return visitedLocationIds.includes(location._id.toString())
+        })
+    }
+    if (likes === true) {
+        locationList.sort((a, b) => b.likes - a.likes)
+    }
+
+    for (let location of locationList) {
+        location._id = location._id.toString()
+    }
+    return locationList
+
+}
+
+
+export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByMostLikes, getLocationByFilters}

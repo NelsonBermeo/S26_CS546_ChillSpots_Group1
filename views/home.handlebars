@@ -7,7 +7,11 @@
       reviews, and explore nearby spots — everything you need to plan the
       perfect, stress-free outing.
     </p>
-    <p>Use the navigation bar to log in or register to get started!</p>
+    {{#if loggedIn}}
+    <p><a href="/search">Find a ChillSpot</a> &nbsp;|&nbsp; <a href="/location/new">Add a ChillSpot</a></p>
+    {{else}}
+    <p><a href="/login">Log In</a> &nbsp;|&nbsp; <a href="/register">Register</a></p>
+    {{/if}}
   </div>
 </div>
 {{> footer}}

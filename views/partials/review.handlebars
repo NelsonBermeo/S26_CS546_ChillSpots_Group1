@@ -1,38 +1,50 @@
-<div class="review">
-  <p class="reviewAuthor">Posted by {{author}}</p>
+<div class="review" data-review-id="{{_id}}">
+  <p class="reviewAuthor">Posted by {{username}}</p>
   <p class="reviewDate">{{date}}</p>
   <p class="reviewRating">Rating: {{rating}}</p>
-  <p class="reviewSafetyRating">Safety Rating: {{safety_rating}}</p>
-  <p class="reviewLikes">Likes: {{likes}}</p>
-  <input
-    type="submit"
-    value="Like"
-    onlick="addLikeToReview({{id}})"
-    id="reviewLikeButton"
-  />
-  <input
-    type="submit"
-    value="Dislike"
-    onlick="addDislikeToReview({{id}})"
-    id="reviewDisikeButton"
-  />
-  <p class="reviewDislikes">Dislikes{{dislikes}}</p>
+  <p class="reviewSafetyRating">Safety Rating: {{safetyRating}}</p>
+  <div class="reviewReactions" data-id="{{_id}}">
+    <p>Likes: <span class="reviewLikes">{{likes}}</span></p>
+    <p>Dislikes: <span class="reviewDislikes">{{dislikes}}</span></p>
+
+    <a href="/reviews/{{_id}}/like" class="likeReview" data-id="{{_id}}">Like</a>
+    <a href="/reviews/{{_id}}/dislike" class="dislikeReview" data-id="{{_id}}">Dislike</a>
+  </div>
+
   <p class="reviewContent">{{content}}</p>
-  {{!-- <input
-    type="submit"
-    value="Post a Comment for this Review!"
-    onlick="submitComment({{id}})"
-    id="postCommentButton"
-  /> --}}
-  <!-- We will replcae input with our form! -->
-  <form method="POST" id="commentForm" action="/comments/{{_id}}"> <!-- Where the full link would be something like /reviews/locationId/comments/reviewId, but idrk -->
-  <label id="commentFormLabel">Write Your Comment:</label>
-  <br>
-  <textarea id="commentTextInput" name="content" required minlength="1" maxlength="1000"></textarea>
-  <br>
-  <button type="submit">Post Comment</button>
-  </form>
-  {{#each comments}}
-    {{> comment this}}
-  {{/each}}
-</div>
+  {{#if pictures.length}}
+  <div class="reviewPics">
+    {{#each pictures}}
+    <img src="{{this}}" alt="Review photo" class="reviewPic" {{/each}} </div>
+    {{/if}}
+    {{!-- <input type="submit" value="Post a Comment for this Review!" onlick="submitComment({{id}})"
+      id="postCommentButton" /> --}}
+    <!-- We will replcae input with our form! -->
+    <form class="reportForm" method="POST" action="/reports">
+      <input type="hidden" name="type" value="review">
+      <input type="hidden" name="item_id" value="{{_id}}">
+
+      <label for="reviewReport-{{_id}}">Report this review:</label>
+      <textarea id="reviewReport-{{_id}}" name="content" maxlength="500"></textarea>
+      <button type="submit">Submit Report</button>
+    </form>
+
+    <form method="POST" id="commentForm" action="/reviews/{{_id}}/comments">
+      <!-- Where the full link would be something like /reviews/locationId/comments/reviewId, but idrk -->
+      <label for="commentText-{{_id}}">Write Your Comment:</label>
+      <br>
+      <textarea id="commentText-{{_id}}" name="commentText" required minlength="1" maxlength="1000"></textarea>
+      <br>
+      <button type="submit">Post Comment</button>
+    </form>
+    <div class="commentList">
+      {{#if comments.length}}
+      {{#each comments}}
+      {{> comment this}}
+      {{/each}}
+      {{else}}
+      <p>No comments yet.</p>
+      {{/if}}
+    </div>
+
+  </div>

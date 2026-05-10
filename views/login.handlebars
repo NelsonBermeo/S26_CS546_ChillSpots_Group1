@@ -1,6 +1,6 @@
 {{!
-    Handlebars Variables:
-        errors: array for errors that occur during login
+Handlebars Variables:
+errors: array for errors that occur during login
 }}
 {{> navbar}}
 <div class="page-content">
@@ -13,9 +13,9 @@
         {{/each}}
       {{/if}}
     </ul>
-    <form id="signin-form" name="signin-form" method="POST">
+    <form id="signin-form" name="signin-form" method="POST" action="/login">
       <label for="email">Email</label>
-      <input type="text" id="email" name="email" />
+      <input type="text" id="email" name="email" value="{{currForm.email}}" />
 
       <label for="password">Password</label>
       <input type="password" id="password" name="password" />

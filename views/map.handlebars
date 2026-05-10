@@ -1,3 +1,4 @@
+{{> navbar}}
 <h1>ChillSpots Map</h1>
 <p>Click on a marker on the map to view details about it.</p>
 
@@ -7,14 +8,34 @@
 
 <script>
     const map = L.map("map").setView([40.7195, -74.043], 10);
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>contributors',
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
-    for (let loc of {{ { locations } }}) {
-        let popup = `${loc.name}<br>${loc.address}<br>
-        Tags: ${loc.tags.join(", ")}<br>
-        Safety Rating: ${loc.average_safety_rating}/5<br>
-        <a href="/locations/${loc._id})">View More Info</a>`;
-        L.marker([loc.coordinates.lat, loc.coordinates.lng]).addTo(map).bindPopup(popup);
-    }
+    fetch("/location/api/map").then((res) => res.json()).then((data) => {
+        if (!data.success) throw 'Could not load map.';
+        if (!Array.isArray(data.locations)) throw 'Map locations were not found.';
+        for (let loc of data.locations) {
+            if (!loc.coordinates || loc.coordinates.lat === undefined || loc.coordinates.lng === undefined) continue;
+            let lat = Number(loc.coordinates.lat);
+            let lng = Number(loc.coordinates.lng);
+            if (Number.isNaN(lat) || Number.isNaN(lng)) continue;
+            let tags = "No tags.";
+            if (Array.isArray(loc.tags) && loc.tags.length > 0) {
+                tags = loc.tags.join(", ");
+            }
+            let safetyRating = "N/A";
+            if (loc.average_safety_rating !== undefined && loc.average_safety_rating !== null) safetyRating = loc.average_safety_rating;
+            let popup = `${loc.name}<br>${loc.address}<br>
+            Tags: ${tags}<br>
+            Safety Rating: ${safetyRating}/5<br>
+            <a href="/location/${loc._id}">View More Info</a>`;
+            L.marker([lat, lng]).addTo(map).bindPopup(popup);
+        }
+    }).catch((e) => {
+        console.log(e);
+        let mapDiv = document.getElementById("map");
+        let err = document.createElement('div');
+        err.textContent = 'There was an error loading the map locations.';
+        mapDiv.before(err);
+    })
 </script>

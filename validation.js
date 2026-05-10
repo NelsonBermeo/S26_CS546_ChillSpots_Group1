@@ -98,7 +98,7 @@ const isCharInAlphabet = (chr, ...args) => {
 
 const isStrInAlphabet = (str, ...args) => {
 	str = checkString(str);
-	return str.split("").map(e => isCharInAlphabet(e, args)).reduce((b1, b2) => b1 && b2)
+	return str.split("").map(e => isCharInAlphabet(e, ...args)).reduce((b1, b2) => b1 && b2)
 }
 
 export const validate = {
@@ -120,7 +120,7 @@ export const validate = {
 		username = checkString(username).toLowerCase();
 		check_length(username, 3, 20);
 		if (!isStrInAlphabet(username, "_", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"))
-			throw `${property} "${name}" contains invalid characters.`;
+			throw `${property} "${username}" contains invalid characters.`;
 		return username;
 	},
 	age : (age, property) => {
@@ -132,14 +132,16 @@ export const validate = {
 	password : (password, property) => {
 		password = checkString(password);
 		check_length(password, 8, 64);
-		if (!/[A-Z]/.test(password)) throw "Error: Password must contain at least one uppercase letter";
-		if (!/[a-z]/.test(password)) throw "Error: Password must contain at least one lowercase letter";
-		if (!/[0-9]/.test(password)) throw "Error: Password must contain at least one number";
-		if (!/[^A-Za-z0-9]/.test(password)) throw "Error: Password must contain at least one special character";
+		if (!/[A-Z]/.test(password)) throw `Error: ${property} must contain at least one uppercase letter`;
+		if (!/[a-z]/.test(password)) throw `Error: ${property} must contain at least one lowercase letter`;
+		if (!/[0-9]/.test(password)) throw `Error: ${property} must contain at least one number`;
+		if (!/[^A-Za-z0-9]/.test(password)) throw `Error: ${property} must contain at least one special character`;
 		return password; 
 	},
 	admin_key : (key) => {
-		if (typeof key !== String) throw "Error: Admin key must be a string.";
+
+		if (typeof key !== "string") throw "Error: Admin key must be a string.";
+
 		if (key === "") return "user";
 		if (key === "SecretAdminKey") return "admin";
 		throw "Error: Admin key incorrect.";
