@@ -77,7 +77,7 @@ router
         locations = await getAllLocations();
       }
 
-      return res.render('locations', {
+      return res.render('location', {
         title: 'Locations',
         locations
       });
