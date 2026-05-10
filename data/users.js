@@ -146,6 +146,8 @@ const addUser = async (
     } else {
         profile_picture = profile_picture.trim()
     }
+
+    // if (profile_picture.startsWith("public/uploads/"))
     // profile picture is optional; maybe I should check if they uploaded a valid path
 
     const newUser = {
@@ -230,7 +232,11 @@ const updateUser = async (
     }
     if (profile_picture){
         //Fix 
-        updated_fields.profile_picture = profile_picture
+        if (profile_picture === undefined || profile_picture === null || profile_picture.trim() === "" ){
+            throw "Error: pfp"
+        } else {
+            updated_fields.profile_picture = profile_picture.trim()
+        }
     }
     if (age) {
         age = checkNumericString(age)
