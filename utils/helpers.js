@@ -24,14 +24,18 @@ export const queryFilteredLocs = async (query) => {
     if (query.name) {
         const name = checkString(xss(query.name), 'name');
         locations = await getLocationsByName(name);
+        console.log("Name route");
     } else if (query.zipcode) {
         const zipcode = checkNumericString(xss(query.zipcode), 'zipcode');
         locations = await getLocationsByZip(zipcode);
+        console.log("zipcode route");
     } else if (query.tags) {
         const tags = parseTags(query.tags);
         locations = await getLocationsByTag(tags);
+        console.log("tag route");
     } else {
         locations = await getAllLocations();
+        console.log("all route");
     }
     return locations;
 }
