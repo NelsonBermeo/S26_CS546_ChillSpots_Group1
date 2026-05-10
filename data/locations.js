@@ -65,7 +65,7 @@ const addLocation = async (
     zipcode, // Since many addresses are similar we need a zipcode to differentiate them
     coordinates, // we can store these as a dict
     // poster, we only need the user id not the username
-    // pictures, ADD BACK IN
+    pictures, //ADD BACK IN
     // reviews, we dont add reviews here 
     // likes, we dont add lkes her e
     // dislikes, we dont add dislikes here 
@@ -128,8 +128,18 @@ const addLocation = async (
     if (!coordinates.lng){
         throw "Coordinates must contain longitude"
     }
-    checkNumericString(coordinates.lat)
-    checkNumericString(coordinates.lng)
+    // checkNumericString(coordinates.lat)
+    // checkNumericString(coordinates.lng)
+    const coordinateRegex = /^-?\d+(\.\d+)?$/
+
+    if (!coordinateRegex.test(coordinates.lat)) {
+        throw "Error: latitude must be a valid coordinate"
+    }
+
+    if (!coordinateRegex.test(coordinates.lng)) {
+        throw "Error: longitude must be a valid coordinate"
+    }
+    
 
     let lat = Number(coordinates.lng)
     let long = Number(coordinates.lng)
@@ -151,6 +161,13 @@ const addLocation = async (
     // }
 
     //tags 
+    if (!Array.isArray(pictures)){
+        throw "Error: Pictures must be an array."
+    } 
+    for (let i = 0; i < pictures.length; i++) { 
+        pictures[i] = checkString(pictures[i]);
+        check_length(pictures[i], 1, 1000)
+    }   
 
     if (!Array.isArray(tags)) throw "Error: Tags must be an array"
     tags = tags.filter((item, index) => tags.indexOf(item) === index);
@@ -169,7 +186,7 @@ const addLocation = async (
         "address": address,
         "zipcode": zipcode,
         "coordinates": { "lat": lat, "lng": long}, 
-        "pictures": [],
+        "pictures": pictures,
         "reviews": [],
         "likes": 0,
         "dislikes": 0,
