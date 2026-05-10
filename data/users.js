@@ -308,4 +308,16 @@ const checkUser = async (emailInput, password) => {
 
 }
 
-export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers}
+const userVisited = async (id, locationId) => {
+    id = checkId(id)
+    locationId = checkId(locationId)
+    const userCollection = await users();
+    let updateInfo = await userCollection.findOneAndUpdate(
+    { _id : new ObjectId(id) },
+    { $push : locationId.toString() },
+    { returnDocument : "after" }
+    )
+    return updateInfo
+}
+
+export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited}

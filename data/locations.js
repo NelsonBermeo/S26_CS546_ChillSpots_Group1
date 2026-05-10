@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
 import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "../validation.js"
+import {removeReview, updateReview, getAllReviews, getReviewById, addReview} from '../data/reviews.js'
 import {users, locations} from '../config/mongoCollections.js';
 
 
@@ -249,7 +250,34 @@ const updateLocation = async (locationid,
 } 
 
 const removeLocation = async (locationId) => {
-//...
+    locationId = checkId(locationId)
+    const locationCollection = await locations()
+    const reviewCollection = await reviews()
+    const userCollection = await users()
+    const location = await locationCollection.findOne({
+        _id: new ObjectId(locationId)
+    })
+    if (!location) throw "Error: Location not found"
+    if (location.reviews.length !== 0){
+        for (let review of location.reviews){
+            let rev = await getReviewById(review)
+            await removeReview(review, rev.userId)
+        }
+    }
+    await userCollection.updateMany({},{ $pull: { added_locations_list: locationId } })
+    await userCollection.updateMany({},{ $pull: { visited_locations_list: locationId } })
+    const deleteInfo = await locationCollection.deleteOne({
+        _id: new ObjectId(locationId)
+    })
+    if (deleteInfo.deletedCount === 0) {
+        throw "Error: Could not delete location"
+    }
+
+    return {
+        locationId: locationId,
+        deleted: true
+    };
+
 }
 
 const getAllLocations = async () => {
@@ -320,4 +348,10 @@ const getLocationsByNameAndTags = async (nameinput, tags) => { //maybe this it t
     return union 
 }
 
-export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip}
+const getLocationByMostLikes = async () => {
+    const locationCollection = await locations()
+    const locationList = await locationCollection.find({}).sort({ likes: -1 }).toArray()
+    return locationList
+}
+
+export {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByMostLikes}
