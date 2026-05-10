@@ -161,7 +161,7 @@ export const addUser = async (
         "profile_picture" : profile_picture, 
         "achievements" : [],
         "added_locations_list" : [],
-        "age" : age,
+        "age" : parsedAge,
         "role" : role
     }
 
@@ -236,7 +236,7 @@ const updateUser = async (
         age = checkNumericString(age)
         const parsedAge = Number(age)
         check_number_range(parsedAge, 13, 120)
-        updated_fields.age = age
+        updated_fields.age = parsedAge
     } 
     if (Object.keys(updated_fields).length === 0) {
         throw "You must provide at least one field to update"

@@ -15,3 +15,4 @@ export const users = getCollectionFn('users');
 export const locations = getCollectionFn('locations');
 export const reviews = getCollectionFn('reviews');
 export const comments = getCollectionFn('comments');
+export const reports = getCollectionFn('reports');
