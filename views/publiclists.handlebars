@@ -1,0 +1,43 @@
+{{> navbar}}
+
+<main class="publicLists">
+    <h1>Public Lists</h1>
+    <h2>New Public List</h2>
+    <form id="publicListForm" method="POST" action="/publiclists">
+        <label for="listName">List Name: </label>
+        <input type="text" id="listName" name="listName" /><br>
+
+        <label for="listTags">Tags:</label>
+        <input type="text" id="listTags" list="tagsForNewList" />
+        <datalist id="tagsForNewList">
+            {{#each allowedTags}}
+            <option value="{{this}}"></option>
+            {{/each}}
+        </datalist>
+        <input type="submit" value="Create New List" id="createPublicList" />
+    </form>
+
+    <h2>All Public Lists</h2>
+    {{#if publicLists.length}}
+    <ul class="publicListsList">
+        {{#each publicLists}}
+        <li class="publicList">
+            <p class="publicListName">{{name}}</p>
+            <p>Creator: {{username}}</p>
+
+            {{#if tags.length}}
+            <p>Tags:
+                {{#each tags}}
+                <span class="tag">{{this}}</span>
+                {{/each}}
+            </p>
+            {{/if}}
+            <p>Number of locations: {{location_list.length}}</p>
+            <a href="/publiclists/{{_id}}">View Locations</a>
+        </li>
+        {{/each}}
+    </ul>
+    {{else}}
+    <div>No public lists exist currently.</div>
+    {{/if}}
+</main>
