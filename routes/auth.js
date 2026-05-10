@@ -2,6 +2,7 @@ import { Router } from 'express';
 import xss from 'xss';
 import { validate } from '../validation.js';
 import { addUser, checkUser } from '../data/users.js';
+import { checkRegisterAchievements } from '../data/achievements.js';
 const router = Router();
 
 import multer from 'multer';
@@ -136,6 +137,10 @@ router
             if (!success) {
                 res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
                 return;
+            }
+            try {
+                await checkRegisterAchievements(success);
+            } catch (e) {
             }
             res.redirect('/login');
             return;
