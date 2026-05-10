@@ -21,6 +21,7 @@ import {
 
 import {addReview} from '../data/reviews.js';
 import * as reports from '../data/reports.js';
+import { checkReviewAchievements, checkLocationAchievements } from '../data/achievements.js';
 
 const router = Router();
 
@@ -139,6 +140,11 @@ router
         pictures,
         tags
       );
+
+      try {
+        await checkLocationAchievements(userId);
+      } catch (e) {
+      }
 
       return res.redirect(`/location/${locationId}`);
     } catch (e) {
@@ -355,6 +361,11 @@ router.post('/:id/reviews', middleware.getuser, async (req, res) => {
     */
 
     await addReview(userId, locationId, content, pictures, safetyRating);
+
+    try {
+      await checkReviewAchievements(userId);
+    } catch (e) {
+    }
 
     return res.redirect(`/location/${locationId}`);
   } catch (e) {
