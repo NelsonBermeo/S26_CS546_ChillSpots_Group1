@@ -167,7 +167,7 @@ const addLocation = async (
         "name": name,
         "address": address,
         "zipcode": zipcode,
-        "coordinates": coordinates, 
+        "coordinates": { "lat": lat, "lng": long}, 
         "pictures": [],
         "reviews": [],
         "likes": 0,
