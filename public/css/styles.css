@@ -4,9 +4,10 @@
   display: flex;
   color: white;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   min-height: 60px;
   box-sizing: border-box;
+  position: relative;
 }
 
 .app-name {
@@ -15,6 +16,17 @@
   color: white;
   margin-left: 0;
   flex-shrink: 0;
+  position: absolute;
+  left: 40px;
+}
+
+.app-name,
+.app-name:link,
+.app-name:visited,
+.app-name:hover,
+.app-name:active {
+  color: white;
+  text-decoration: none;
 }
 
 .nav-links {
@@ -25,18 +37,20 @@
   padding: 0;
   font-size: 20px;
   align-items: center;
+  justify-content: center;
 }
 
 .nav-item {
   margin-right: 0;
-  .nav-link,
-  .nav-link:link,
-  .nav-link:visited,
-  .nav-link:hover,
-  .nav-link:active {
-    text-decoration: none;
-    color: white;
-  }
+}
+
+.nav-link,
+.nav-link:link,
+.nav-link:visited,
+.nav-link:hover,
+.nav-link:active {
+  text-decoration: none;
+  color: white;
 }
 
 /* general page layout */
