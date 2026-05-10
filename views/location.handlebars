@@ -2,13 +2,28 @@
 <main class="location">
     <h1>{{name}}</h1>
     <p class="locAddress">{{address}}</p>
+    <p>ZIP Code: {{zipcode}}</p>
+    {{#if coordinates}}
+    <p>Coordinates: {{coordinates.lat}}, {{coordinates.lng}}</p>
+    {{/if}}
+
+    {{#if images.length}}
     {{#each images}}
     <img src="{{this}}" class="locationImage" />
     {{/each}}
+    {{else}}
+    <p>No images for this location have been uploaded yet.</p>
+    {{/if}}
 
-    <p class="locLikes">{{likes}}</p>
-    <p class="locDislikes">{{dislikes}}</p>
-    <p class="locAvgSafety">{{average_safety_rating}}</p>
+    <div class="locationReactions" data-id="{{_id}}">
+        <p>Likes: <span class="locationLikes">{{likes}}</span></p>
+        <p>Dislikes: <span class="locationDislikes">{{dislikes}}</span></p>
+
+        <a href="/location/{{_id}}/like" class="likeLocation" data-id="{{_id}}">Like</a>
+        <a href="/location/{{_id}}/dislike" class="dislikeLocation" data-id="{{_id}}">Dislike</a>
+    </div>
+    <p class="locAvgSafety">Average Safety Rating: {{average_safety_rating}}</p>
+
     {{#if tags.length}}
     <p>
         Tags:
@@ -21,6 +36,17 @@
     <!-- Something to keep in mind is that our input's need names. Express reads fields from req.body using name -->
     <!-- Also, action, as stated in the slideshow: "signifies where the form will be submitted to" -> After some googling I realized that this meant to what URL:
 for example url/questions, we will send the review to url/reviews/{{_id}} which is the id of the location we are currently viewing -->
+    <form class="visitedForm" method="POST" action="/location/{{_id}}/visited">
+        <button type="submit">Mark As Visited</button>
+    </form>
+    <form class="reportForm" method="POST" action="/reports">
+        <input type="hidden" name="type" value="location">
+        <input type="hidden" name="item_id" value="{{_id}}">
+
+        <label for="locationReportContent">Report this location:</label>
+        <textarea id="locationReportContent" name="content" maxlength="500"></textarea>
+        <button type="submit">Submit Report</button>
+    </form>
     <form method="POST" id="reviewForm" action="/location/{{_id}}/reviews" enctype="multipart/form-data">
         <label id="reviewFormLabel">
             Write Your Review:</label>

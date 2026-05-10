@@ -30,8 +30,8 @@
         <input type="text" id="lng" name="lng" />
         <br />
 
-        <label for="locTags">Tags:</label>
-        <input type="text" id="locTags" name="locTags" list="tagsForNewLoc" multiple />
+        <label for="tags">Tags:</label>
+        <input type="text" id="tags" name="tags" list="tagsForNewLoc" multiple />
         <datalist id="tagsForNewLoc">
             {{#each allowedTags}}
             <option value="{{this}}"></option>
