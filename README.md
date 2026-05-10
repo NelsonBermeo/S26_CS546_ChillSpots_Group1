@@ -2,69 +2,111 @@
 
 ***Discover your next local chill.***
 
-## 📌 Overview
+## Overview
 
-**ChillSpots** helps users discover relaxing piers, scenic parks, quiet lakes, and other hidden gems perfect for an afternoon escape. Users can share photos, leave reviews, and explore nearby restaurants and amenities, everything you need to plan the perfect, stress-free outing. 
+**ChillSpots** is a community-driven web application that helps users discover relaxing local destinations such as scenic parks, piers, lakes, cafes, overlooks, and other hidden gems. Users can browse locations, share reviews and safety ratings, upload experiences, and discover nearby spots perfect for relaxing or hanging out.
 
-## Setup
-### General Dependencies
-Please have `nodejs` and `npm` installed. 
-Once you have the code of the project ready, install the nodejs dependencies with `npm i`
+The goal of ChillSpots is to make it easier for people to find enjoyable, low-stress places in their area through real user experiences and community interaction.
 
-### Platform-spesific Dependencies
-?
+---
 
-## Seeding the database
-This will allow you to populate your database with realistic data to emulate real-world use of this website.
-Once your mongodb database is up and running, create a database with the name `?` and initial collection `?`.
-After this is done, you can run `npm run seed`, which will populate the database.
+# Features
 
-?
+## Current Features
 
-## Running the project
-Once all of the project dependencies are set up (and mongodb is running), you can start the project with `npm start`
+- **Location Discovery**
+  - Browse user-submitted chill spots
+  - Search locations by name, tags, or ZIP code
+  - View detailed location pages
 
-## 🚀 Key Features
+- **Interactive Map**
+  - Explore locations visually through a map interface
+  - View coordinates and nearby spots
 
-- **🔍 Location Look Up:**  
-  ?
+- **User Accounts**
+  - User registration and login
+  - Session-based authentication
+  - Public and private profile pages
 
-- **🧠 :**  
+- **Reviews & Ratings**
+  - Leave reviews for locations
+  - Safety rating system
+  - Community-driven feedback
 
-- **📄 :**  
+- **Review Reactions**
+  - Like/dislike review system
+  - Report inappropriate reviews
 
-- **👥 :**  
+- **Moderation Tools**
+  - Report locations or reviews
+  - Moderation/report scaffolding for admin systems
 
-- **🤝 :**  
+- **User Lists & Visited Locations**
+  - Public lists scaffolding
+  - Visited locations tracking scaffolding
 
-- **📨 :**  
-=
-- **🏆 :**  
+---
 
-- **🔔 :**  
+# Planned Features
 
-## ✨ Planned Extra Features
+- **Comment System**
+  - Nested comments and discussions on reviews
 
-- **💬 :**  
+- **Friend System**
+  - Add friends and view shared activity
 
-- **📢 :**  
+- **Notifications**
+  - Alerts for interactions, reports, and friend activity
 
-- **🧠 **
+- **Achievements**
+  - User milestones and badges
 
-## 💡 Tech Stack
+- **Nearby Restaurant Integration**
+  - Nearby food and activity recommendations
 
-- **Frontend:** HTML/CSS, JavaScript, Handlebars.js  
-- **Backend:** Node.js, Express.js  
-- **Database:** MongoDB  
-- **APIs:** ?  
-- **Others:** ?
+- **Admin Dashboard**
+  - Review moderation and report management
 
-## 👩‍💻 Team ChillSpots
+---
 
-- Christopher Bernard
-- Jamil Torres
-- Nelson Bermeo 
-- Ryan Johnson
-- Sahil Virani
+# Tech Stack
 
-🔗 [GitHub Repository](https://github.com/NelsonBermeo/S26_CS546_ChillSpots_Group1)
+## Frontend
+- HTML
+- CSS
+- JavaScript
+- Handlebars.js
+
+## Backend
+- Node.js
+- Express.js
+
+## Database
+- MongoDB
+
+## Additional Libraries
+- express-session
+- bcrypt
+- xss
+- mongodb
+
+---
+
+# Setup
+
+## Prerequisites
+
+Please install the following before running the project:
+
+- Node.js
+- npm
+- MongoDB
+
+---
+
+## Install Dependencies
+
+Run:
+
+```bash
+npm install
