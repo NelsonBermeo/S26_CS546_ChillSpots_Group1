@@ -42,11 +42,11 @@ profilePic
     <input type="file" id="newProfilePic" name="newProfilePic" accept="image/png,image/jpeg,image/webp" />
     <br />
 
-    <button type="submit" class="btn-primary">Update Profile</button>
+    <button type="submit">Update Profile</button>
   </form>
   </section>
   <section>
-    <h2>Vistied Locations</h2>
+    <h2>Visited Locations</h2>
     {{#if visited.length}}
     <ul>
       {{#each visited}}
@@ -68,6 +68,12 @@ profilePic
     {{else}}
     <p>No friends yet.</p>
     {{/if}}
+    <form id="addFriendForm" method="POST" action="/user/friends">
+      <label for="friendUsername">Add Friend by Username:</label>
+      <input type="text" id="friendUsername" name="friendUsername">
+
+      <button type="submit">Add Friend</button>
+    </form>
   </section>
   <section>
     <h2>Public Lists</h2>
@@ -78,7 +84,7 @@ profilePic
       {{/each}}
     </ul>
     {{else}}
-    <p>No locations visited yet.</p>
+    <p>No public lists created yet.</p>
     {{/if}}
   </section>
   <section>
