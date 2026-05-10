@@ -139,7 +139,7 @@ export const validate = {
 		return password; 
 	},
 	admin_key : (key) => {
-		if (typeof key !== String) throw "Error: Admin key must be a string.";
+		if (typeof key !== "string") throw "Error: Admin key must be a string.";
 		if (key === "") return "user";
 		if (key === "SecretAdminKey") return "admin";
 		throw "Error: Admin key incorrect.";
