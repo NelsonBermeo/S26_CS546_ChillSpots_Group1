@@ -490,12 +490,6 @@ router.post("/:id/visited", middleware.getuser, async (req, res) => {
             undefined});
       }
     }
-
-
-    // return notImplemented(
-    //   res,
-    //   "Requires markLocationVisited(userId, locationId) implementation in data/users.js or data/locations.js.",
-    // );
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Visited Error',

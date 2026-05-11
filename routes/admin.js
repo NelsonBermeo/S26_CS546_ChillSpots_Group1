@@ -50,13 +50,12 @@ router
 
                 res.render('admindashboard', {
                     title: "Admin Dashboard",
-                    page_script: "../public/js/admin.js",
                     reports: reportList,
                     loggedIn: true,
                     isAdmin: true
                 })
             } catch (e) {
-                res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
+                return res.status(500).render('error', {title: "Error", error: "Internal Server Error"})
             }
         } else { res.redirect('/'); return; }
     });
@@ -65,40 +64,60 @@ router
     .route('/dashboard/:reportId')
     .delete(async (req, res) => {
         // This might need clientside js to directly inject the result into the delete method
-        req.params.reportId = checkId(req.params.reportId, "Report ID");
-        const report = await reports.getReportById(req.params.reportId);
+        try {
+            req.params.reportId = checkId(req.params.reportId, "Report ID");
+            const report = await reports.getReportById(req.params.reportId);
 
-        switch (report.type) {
-        case "location":
-            try{
+            switch (report.type) {
+            case "location": {
                 const location = await locations.getLocationById(report.item_id);
                 // What does it even mean to remove a location???
                 // Do we also delete any reviews with comments left at that location?
                 // Same question for reviews.
                 await locations.removeLocation(report.item_id);
-            } catch (e) {
-                res.status(404).render('error', {title: "Error", error: e})
+                break; 
             }
-            break;
-        case "comment":
-            try {
+            case "comment": {
                 const comment = await comments.getCommentById(report.item_id);
                 await comments.removeComment(report.item_id);
-            } catch (e) {
-                res.status(404).render('error', {title: "Error", error: e})
+                break;
             }
-            break;
-        case "review":
-            try {
+            case "review": {
                 const review = await reviews.getReviewById(report.item_id);
                 await reviews.removeReview(report.item_id);
-            } catch (e) {
-                res.status(404).render('error', {title: "Error", error: e})
+                break;
             }
-            break;
-        default:
-            res.status(500).render('error', {title: "Error", error: `report type not found for: ${report.type}`})
+            default:
+                return res.status(400).json({
+                    error: `Unknown report type: ${report.type}`
+                });
+            }
+            await reports.removeReport(req.params.reportId);
+            return res.json({ success: true });
+        } catch (e) {
+            return res.status(500).json({
+                error: e.toString()
+            });
         }
     })
+
+router
+    .route('/dashboard/:reportId/ignore')
+    .delete(async (req, res) => {
+        try {
+            const reportId = checkId(req.params.reportId, "Report ID");
+
+            const report = await reports.getReportById(reportId);
+            if (!report) {
+                return res.status(404).json({ error: "Report not found" });
+            }
+
+            reports.removeReport(reportId);
+
+            return res.json({ success: true });
+        } catch (e) {
+            return res.status(500).json({ error: e.toString() });
+        }
+    });
 
 export default router;
