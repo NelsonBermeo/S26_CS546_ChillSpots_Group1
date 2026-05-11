@@ -30,10 +30,10 @@
         <input type="text" id="lng" name="lng" />
         <br />
 
-        <label for="tags">Tags:</label>
+        <label for="tags">Tags (separated by commas):</label>
         <input type="text" id="tags" name="tags" list="tagsForNewLoc" />
         <datalist id="tagsForNewLoc">
-            {{#each tags}}
+            {{#each allowedTags}}
             <option value="{{this}}"></option>
             {{/each}}
         </datalist>
