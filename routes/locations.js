@@ -219,6 +219,7 @@ router.get("/new", middleware.getuser, async (req, res) => {
   try {
     return res.render("newLocation", {
       title: "Add Location",
+      allowedTags
     });
   } catch (e) {
     return res.status(400).render('error', {
