@@ -1,7 +1,7 @@
 import {closeConnection, dbConnection} from '../config/mongoConnection.js';
-import {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers} from '../data/users.js';
+import {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited, addFriend} from '../data/users.js';
 import {removeReview, updateReview, getAllReviews, getReviewById, addReview} from '../data/reviews.js'
-import {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip} from '../data/locations.js'
+import {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByFilters} from '../data/locations.js'
 import {addComment, getCommentById, getCommentsByReviewId, updateComment, removeComment} from '../data/comments.js'
 
 const db = await dbConnection()
@@ -193,125 +193,32 @@ try {
   console.log(e)
 }
 
+let check = undefined
+let check2 = undefined
+let check3 = undefined
+
+
+try {
+  check = await userVisited(testuser1, testlocation1)
+} catch (e) {
+  console.log(e)
+}
+
+try {
+  check2 = await removeLocation(testlocation2)
+} catch (e) {
+  console.log(e)
+}
+
+try {
+  check3 = await getUserById(testuser1)
+  console.log(check3)
+} catch (e) {
+  console.log(e)
+}
 
 
 
-
-// if (hideuser){
-// try {
-//   allusers = await getAllUsers()
-//   console.log(allusers)
-// } catch (e) {
-//   console.log(e)
-// }
-// console.log("---------------------------------------")
-// try {
-//   testGetId = await getUserById(testuser)
-//   testGetEmail = await getUserByEmail(testGetId.email)
-//   console.log(testGetEmail)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// console.log("---------------------------------------")
-// try {
-//   checkUserF = await checkUser("nelsonb@gmail.com", "Password123!")
-//   console.log(checkUserF)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// console.log("---------------------------------------")
-
-// try {
-//   testuserupdate = await updateUser(testuser, "", "bernard", "nelsonbernard")
-//   console.log(testuserupdate)
-// } catch (e) {
-//   console.log(e)
-// }
-// }
-
-// try {
-//   testlocation = await addLocation(testuser, "Bernards Balls", "1st street", "07030", {lat: "90", lng: "140"}, ["park", "park"])
-//   console.log(testlocation)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// try {
-//   testreview = await addReview(testuser, testlocation, "Wow Bernard's balls is so amazing and a wonderful place to visit!", "2")
-//   console.log(testreview)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// try {
-//   revid = await removeReview(testreview, testuser)
-//   console.log(revid)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// try {
-//   locid = await getLocationById(testlocation)
-//   console.log(locid)
-// } catch (e) {
-//   console.log(e)
-// }
-
-
-// try {
-//   updaterev = await updateReview(testreview, "Wowwwie", "4")
-//   console.log(updaterev)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// try {
-//   revid = await getLocationById(testlocation)
-//   console.log(revid)
-// } catch (e) {
-//   console.log(e)
-// }
-// console.log("------------------Loc---------------------")
-
-
-// try {
-//   revid = await getReviewById(testreview)
-//   console.log(revid)
-// } catch (e) {
-//   console.log(e)
-// }
-
-
-
-// try {
-//   testlocation2 = await addLocation(testuser, "Bernards Balls", "1st street", "12345", {lat: "90", lng: "140"}, ["park", "park"])
-//   console.log(testlocation2)
-// } catch (e) {
-//   console.log(e)
-// }
-// try {
-//   testlocation3 = await addLocation(testuser, "Bernards Balls", "1st street", "12345", {lat: "90", lng: "140"}, ["park", "park"])
-//   console.log(testlocation3)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// console.log("------------------Locos by zip---------------------")
-// try {
-//   tagLoco = await getLocationsByZip("12345")
-//   console.log(tagLoco)
-// } catch (e) {
-//   console.log(e)
-// }
-
-// try {
-//   testreview = await addReview(testuser, "bermeo", "nellyb", "nelsonb@gmail.com", "Password123!", "profile_picture", "20")
-//   console.log(testuser)
-// } catch (e) {
-//   console.log(e)
-// }
 
 
 await closeConnection();
