@@ -1,6 +1,6 @@
 import {closeConnection, dbConnection} from '../config/mongoConnection.js';
 import {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited, addFriend} from '../data/users.js';
-import {removeReview, updateReview, getAllReviews, getReviewById, addReview} from '../data/reviews.js'
+import {removeReview, updateReview, getAllReviews, getReviewById, addReview, toggleReviewLike, toggleReviewDislike} from '../data/reviews.js'
 import {addLocation, getLocationById, updateLocation, removeLocation, getAllLocations, getLocationsByTag, getLocationsByName, getLocationsByZip, getLocationByFilters} from '../data/locations.js'
 import {addComment, getCommentById, getCommentsByReviewId, updateComment, removeComment} from '../data/comments.js'
 
@@ -189,30 +189,6 @@ try {
 
 try {
   testcomment3 = await addComment(testreview4, testuser4, "why are you in my house this never happened")
-} catch (e) {
-  console.log(e)
-}
-
-let check = undefined
-let check2 = undefined
-let check3 = undefined
-
-
-try {
-  check = await userVisited(testuser1, testlocation1)
-} catch (e) {
-  console.log(e)
-}
-
-try {
-  check2 = await removeLocation(testlocation2)
-} catch (e) {
-  console.log(e)
-}
-
-try {
-  check3 = await getUserById(testuser1)
-  console.log(check3)
 } catch (e) {
   console.log(e)
 }

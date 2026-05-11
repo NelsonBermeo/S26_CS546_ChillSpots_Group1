@@ -4,9 +4,8 @@ import { validate } from '../validation.js';
 import { addUser, checkUser } from '../data/users.js';
 import { checkRegisterAchievements } from '../data/achievements.js';
 const router = Router();
-
-import multer from 'multer';
-const upload = multer({dest: 'uploads/'});
+import {upload} from "../middleware/upload.js"
+import {uploadImage} from "../utils/imageUpload.js"
 
 router.route('/').get(async (req, res) => {
     try {
@@ -138,13 +137,17 @@ router
             return;
         }
         try {
+            let profilePicUrl = "/public/images/default-profile.jpg";
+            if(req.file){
+                profilePicUrl = await uploadImage(req.file, "users")
+            }
             let success = await addUser(
                 req.body.firstName,
                 req.body.lastName,
                 req.body.username,
                 req.body.email,
                 req.body.password,
-                req.file,
+                profilePicUrl,
                 req.body.age,
                 req.body.adminSecret
             )

@@ -29,6 +29,8 @@ import {
   checkLocationAchievements,
   checkLocationLikeAchievements,
 } from "../data/achievements.js";
+import {upload} from "../middleware/upload.js"
+import {uploadMultipleImages} from "../utils/imageUpload.js"
 import { userHasVisited, userVisited } from "../data/users.js";
 
 const router = Router();
@@ -142,7 +144,7 @@ router
   })
 
   //creates a new user-submitted location
-  .post(middleware.getuser, async (req, res) => {
+  .post(middleware.getuser, upload.array("locPics", 5), async (req, res) => {
     try {
       const userId = checkId(req.session.member._id, "userId");
 
@@ -160,7 +162,7 @@ router
         lng: req.body.lng,
       };
 
-      const pictures = [];
+      const pictures = await uploadMultipleImages(req.files, "locations");
       const tags = parseTags(req.body.tags);
 
       const locationId = await addLocation(
@@ -414,7 +416,7 @@ router.post("/:id/delete", middleware.getuser, async (req, res) => {
 });
 
 //creates a review for a specific location
-router.post("/:id/reviews", middleware.getuser, async (req, res) => {
+router.post("/:id/reviews", middleware.getuser, upload.array("reviewPics", 5),async (req, res) => {
   try {
     const locationId = checkId(req.params.id, "locationId");
     const userId = checkId(req.session.member._id, "userId");
@@ -427,7 +429,7 @@ router.post("/:id/reviews", middleware.getuser, async (req, res) => {
       "safetyRating",
     );
 
-    const pictures = [];
+    const pictures = await uploadMultipleImages(req.files, "reviews");
 
     /*
     TODO:
