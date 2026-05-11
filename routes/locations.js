@@ -1,5 +1,8 @@
 import {Router} from 'express';
 import xss from 'xss';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 import {
   checkId,
   checkString,
@@ -31,6 +34,62 @@ import {
 } from '../data/achievements.js';
 
 const router = Router();
+
+const locationUploadDir = path.join(
+  process.cwd(),
+  'public',
+  'uploads',
+  'locations'
+);
+
+if (!fs.existsSync(locationUploadDir)) {
+  fs.mkdirSync(locationUploadDir, {recursive: true});
+}
+
+const locationStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, locationUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, filename);
+  }
+});
+
+const locationFileFilter = (req, file, cb) => {
+  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (!allowedMimeTypes.includes(file.mimetype) || !allowedExtensions.includes(ext)) {
+    return cb(new Error('Only JPG, JPEG, PNG, and WEBP image files are allowed.'));
+  }
+
+  return cb(null, true);
+};
+
+const uploadLocationPictures = multer({
+  storage: locationStorage,
+  fileFilter: locationFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 5
+  }
+}).array('locPics', 5);
+
+const handleLocationUpload = (req, res, next) => {
+  uploadLocationPictures(req, res, (err) => {
+    if (err) {
+      return res.status(400).render('error', {
+        title: 'Location Image Upload Error',
+        error: err.message || err.toString()
+      });
+    }
+
+    return next();
+  });
+};
 
 /*
 TODO:
@@ -89,7 +148,6 @@ router
       }
 
       const zip = req.query.zip || null;
-
       const name = req.query.loc_name || null;
 
       let tags = req.query.tags || null;
@@ -133,7 +191,7 @@ router
   })
 
   //creates a new user-submitted location
-  .post(middleware.getuser, async (req, res) => {
+  .post(middleware.getuser, handleLocationUpload, async (req, res) => {
     try {
       const userId = checkId(req.session.member._id, 'userId');
 
@@ -151,7 +209,10 @@ router
         lng: req.body.lng
       };
 
-      const pictures = [];
+      const pictures = req.files
+        ? req.files.map((file) => `/public/uploads/locations/${file.filename}`)
+        : [];
+
       const tags = parseTags(req.body.tags);
 
       const locationId = await addLocation(
