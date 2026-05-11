@@ -15,7 +15,8 @@ export async function uploadImage(image, folder) {
   else if (image.mimetype === "image/jpeg") ext = "jpg";
   else if (image.mimetype === "image/webp") ext = "webp";
 
-  let cmd = PutObjectCommand({
+  let key = `${folder}/${crypto.randomUUID()}.${ext}`;
+  let cmd = new PutObjectCommand({
     Bucket: process.env.AWS_S3_BUCKET,
     Key: key,
     Body: image.buffer,
@@ -24,10 +25,11 @@ export async function uploadImage(image, folder) {
 
   await s3.send(cmd);
 
-  return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${folder}/${crypto.randomUUID()}.${ext}`;
+  return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 }
 
 export async function uploadMultipleImages(imgs, folder) {
+  if (!imgs || imgs.length === 0) return [];
   let urls = [];
   for (let img of imgs) {
     let url = await uploadImage(img, folder);
