@@ -29,6 +29,7 @@ import {
   checkLocationAchievements,
   checkLocationLikeAchievements,
 } from "../data/achievements.js";
+import { userHasVisited, userVisited } from "../data/users.js";
 
 const router = Router();
 
@@ -459,10 +460,39 @@ router.post("/:id/visited", middleware.getuser, async (req, res) => {
     const locationId = checkId(req.params.id, "locationId");
     const userId = checkId(req.session.member._id, "userId");
 
-    return notImplemented(
-      res,
-      "Requires markLocationVisited(userId, locationId) implementation in data/users.js or data/locations.js.",
-    );
+    const userVisted = await userHasVisited(userId, locationId);
+    if (userVisted) {
+      const locations = await getLocationByFilters(
+        req.session.member._id,
+        null,
+        null,
+        null,
+        null,
+        null,
+      );
+
+      return res.render("location", {
+        title: "ChillSpots - Search Locations",
+        locations
+      });
+    } else {
+      const success = userVisited(userId, locationId);
+      if (!success) {
+        return res.status(400).render('error', {
+          title: 'Visited Error',
+          error: "Could not visit this location.",
+          loggedIn: Boolean(req.session.member),
+          isAdmin: (Boolean(req.session.member)) ? 
+            req.session.member.role === 'admin' :
+            undefined});
+      }
+    }
+
+
+    // return notImplemented(
+    //   res,
+    //   "Requires markLocationVisited(userId, locationId) implementation in data/users.js or data/locations.js.",
+    // );
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Visited Error',
