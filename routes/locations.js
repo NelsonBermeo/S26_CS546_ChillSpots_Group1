@@ -20,9 +20,10 @@ import {
   toggleLocationLike,
   toggleLocationDislike,
   getLocationByFilters,
+  allowedTags
 } from "../data/locations.js";
 
-import { addReview } from "../data/reviews.js";
+import { addReview, getReviewsByLocationId } from "../data/reviews.js";
 import * as reports from "../data/reports.js";
 import {
   checkReviewAchievements,
@@ -31,6 +32,7 @@ import {
 } from "../data/achievements.js";
 import {upload} from "../middleware/upload.js"
 import {uploadMultipleImages} from "../utils/imageUpload.js"
+import { userHasVisited, userVisited } from "../data/users.js";
 
 const router = Router();
 
@@ -516,10 +518,39 @@ router.post("/:id/visited", middleware.getuser, async (req, res) => {
     const locationId = checkId(req.params.id, "locationId");
     const userId = checkId(req.session.member._id, "userId");
 
-    return notImplemented(
-      res,
-      "Requires markLocationVisited(userId, locationId) implementation in data/users.js or data/locations.js.",
-    );
+    const userVisted = await userHasVisited(userId, locationId);
+    if (userVisted) {
+      const locations = await getLocationByFilters(
+        req.session.member._id,
+        null,
+        null,
+        null,
+        null,
+        null,
+      );
+
+      return res.render("location", {
+        title: "ChillSpots - Search Locations",
+        locations
+      });
+    } else {
+      const success = userVisited(userId, locationId);
+      if (!success) {
+        return res.status(400).render('error', {
+          title: 'Visited Error',
+          error: "Could not visit this location.",
+          loggedIn: Boolean(req.session.member),
+          isAdmin: (Boolean(req.session.member)) ? 
+            req.session.member.role === 'admin' :
+            undefined});
+      }
+    }
+
+
+    // return notImplemented(
+    //   res,
+    //   "Requires markLocationVisited(userId, locationId) implementation in data/users.js or data/locations.js.",
+    // );
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Visited Error',
@@ -568,9 +599,10 @@ router.get("/:id", async (req, res) => {
     Add getReviewsByLocationId(locationId) from data/reviews.js later.
     For now, location.reviews may only contain review IDs.
     */
-
+    const reviewList = await getReviewsByLocationId(locationId);
     return res.render("location", {
       title: location.name || "Location",
+      locations: [{
       _id: location._id.toString(),
       name: location.name,
       address: location.address,
@@ -579,10 +611,11 @@ router.get("/:id", async (req, res) => {
       likes: location.likes || 0,
       dislikes: location.dislikes || 0,
       tags: location.tags || [],
-      reviews: location.reviews || [],
+      reviews: reviewList || [],
       images: location.images || location.pictures || [],
       average_safety_rating:
         location.average_safety_rating || location.average_saftey_rating || 0,
+      }]
     });
   } catch (e) {
     return res.status(400).render('error', {

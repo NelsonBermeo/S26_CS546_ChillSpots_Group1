@@ -314,6 +314,20 @@ const checkUser = async (emailInput, password) => {
 
 }
 
+const userHasVisited = async (id, locationId) => {
+    id = checkId(id);
+    locationId = checkId(locationId);
+
+    const userCollection = await users();
+
+    const user = await userCollection.findOne({
+        _id: new ObjectId(id),
+        visited_locations_list: locationId.toString()
+    });
+
+    return user;
+};
+
 const userVisited = async (id, locationId) => {
     id = checkId(id)
     locationId = checkId(locationId)
@@ -356,4 +370,4 @@ const addFriend = async (userId, friendId) => {
     return updateInfo
 }
 
-export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited, addFriend}
+export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited, addFriend, userHasVisited}

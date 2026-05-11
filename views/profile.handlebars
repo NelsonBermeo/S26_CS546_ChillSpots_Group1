@@ -50,7 +50,7 @@ profilePic
     {{#if visited.length}}
     <ul>
       {{#each visited}}
-        <li><a href="/location/{{this}}">{{this}}</a></li>
+        <li><a href="/location?loc_name={{loc_name}}">{{loc_name}}</a></li>
       {{/each}}
     </ul>
     {{else}}
