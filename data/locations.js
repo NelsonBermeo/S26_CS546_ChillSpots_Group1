@@ -4,7 +4,6 @@ import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2,
 import {removeReview, updateReview, getAllReviews, getReviewById, addReview} from '../data/reviews.js'
 import {users, locations, reviews} from '../config/mongoCollections.js';
 
-
 const allowedTags = [
         "park",
         "pier",
@@ -191,7 +190,7 @@ const addLocation = async (
         "likes": 0,
         "dislikes": 0,
         "tags": tags, 
-        "average_saftey_rating": 0
+        "average_safety_rating": 0
     }
 
     const insertInfo = await locationCollection.insertOne(newLocation)
