@@ -130,14 +130,20 @@ router
           query: req.query.loc_name || "",
           zip: req.query.zip || "",
           tags : req.query.tags || "",
-          loggedIn: true,
-          isAdmin: req.session.member.role === 'admin'
+          loggedIn: Boolean(req.session.member),
+          isAdmin: (Boolean(req.session.member)) ? 
+              req.session.member.role === 'admin' :
+              undefined
         });
       }
     } catch (e) {
       return res.status(400).render('error', {
         title: 'Locations Error',
-        error: e.toString()
+        error: e.toString(),
+        loggedIn: Boolean(req.session.member),
+        isAdmin: (Boolean(req.session.member)) ? 
+            req.session.member.role === 'admin' :
+            undefined
       });
     }
   })
@@ -183,7 +189,11 @@ router
     } catch (e) {
       return res.status(400).render('error', {
         title: 'Create Location Error',
-        error: e.toString()
+        error: e.toString(),
+        loggedIn: Boolean(req.session.member),
+        isAdmin: (Boolean(req.session.member)) ? 
+            req.session.member.role === 'admin' :
+            undefined
       });
     }
   });
@@ -202,7 +212,11 @@ router.get('/map', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Map Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -218,7 +232,11 @@ router.get('/new', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'New Location Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -298,7 +316,11 @@ router.post('/:id/like', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Location Like Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -315,7 +337,11 @@ router.post('/:id/dislike', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Location Dislike Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -341,7 +367,11 @@ router.get('/:id/edit', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Edit Location Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -358,7 +388,11 @@ router.post('/:id/edit', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Update Location Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -375,7 +409,11 @@ router.post('/:id/delete', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Delete Location Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -413,7 +451,11 @@ router.post('/:id/reviews', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Review Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -431,7 +473,11 @@ router.post('/:id/visited', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Visited Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -452,7 +498,11 @@ router.post('/:id/reports', middleware.getuser, async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Report Location Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });
@@ -487,7 +537,11 @@ router.get('/:id', async (req, res) => {
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Location Error',
-      error: e.toString()
+      error: e.toString(),
+      loggedIn: Boolean(req.session.member),
+      isAdmin: (Boolean(req.session.member)) ? 
+          req.session.member.role === 'admin' :
+          undefined
     });
   }
 });

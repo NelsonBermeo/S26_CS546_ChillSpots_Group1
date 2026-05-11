@@ -14,7 +14,11 @@ const constructorMethod = (app) => {
     app.use((req, res) => {
         res.status(404).render("error", {
             title: "Error",
-            error: "The page you are looking for cannot be found."
+            error: "The page you are looking for cannot be found.",
+            loggedIn: Boolean(req.session.member),
+            isAdmin: (Boolean(req.session.member)) ? 
+                req.session.member.role === 'admin' :
+                undefined
         })
     })
 }
