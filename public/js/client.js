@@ -67,7 +67,7 @@
     }
     errorsElem.empty();
     for (let e of errors) {
-      error = $("<li></li>").text(e);
+      let error = $("<li></li>").text(e);
       errorsElem.append(error);
     }
   }
@@ -77,7 +77,7 @@
     return e.val().trim();
   }
   function onlyDigits(s) {
-    return /^\d+$/.test(str);
+    return /^\d+$/.test(s);
   }
   function validName(name) {
     if (!name || onlyDigits(name) || name.length < 1 || name.length > 50)
@@ -127,34 +127,37 @@
   function validLat(c) {
     if (!validCoord(c)) return false;
     let n = Number(c);
-    return !Number.isNaN(n) && (n >= -90) & (n <= 90);
+    return !Number.isNaN(n) && n >= -90 && n <= 90;
   }
   function validLng(c) {
     if (!validCoord(c)) return false;
     let n = Number(c);
-    return !Number.isNaN(n) && (n >= -180) & (n <= 180);
+    return !Number.isNaN(n) && n >= -180 && n <= 180;
   }
   function validImgs(id, errors, type, maxImgs) {
     let input = $("#" + id)[0];
     if (!input || !input.files || input.files.length === 0) return;
     if (input.files.length > maxImgs) {
-      errors.push(type + "can include up to " + maxImgs + " image(s).");
+      errors.push(type + " can include up to " + maxImgs + " image(s).");
     }
     for (let img of input.files) {
-      if (!allowedExtns.includes(file.type)) {
-        errors.psuh(type + "must contain JPG, PNG, or WEBP image(s)");
+      if (!allowedExtns.includes(img.type)) {
+        errors.push(type + " must contain JPG, PNG, or WEBP image(s)");
       }
     }
   }
   function getTags(id) {
     let rawTags = valueFromId(id);
     if (!rawTags) return [];
-    let tags = rawTags.split(",").map((tag) => tag.trim());
+    let tags = rawTags
+      .split(",")
+      .map((tag) => tag.trim().toLowerCase())
+      .filter((tag) => tag.length > 0);
     return tags;
   }
   function validateTags(tags, errors, field) {
     if (tags.length > 10) {
-      errors.push(field + "can only have 10 tags or less.");
+      errors.push(field + " can only have 10 tags or less.");
       return;
     }
     for (let tag of tags) {
@@ -189,7 +192,7 @@
       errors.push(
         "Username must be 3-20 chars and contain letters, numbers, or underscores only.",
       );
-    if (!onlyDigits(age) || Number(age) < 13 || Number(age > 120))
+    if (!onlyDigits(age) || Number(age) < 13 || Number(age) > 120)
       errors.push("Age must be an integer between 13 and 120.");
     if (!validEmail(email)) errors.push("Email must be a valid email.");
 
@@ -207,9 +210,9 @@
 
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
   $("#signin-form").on("submit", function (event) {
@@ -227,19 +230,19 @@
       );
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
   $("#addLocationForm").on("submit", function (event) {
     let errors = [];
     let name = valueFromId("name");
     let address = valueFromId("address");
-    let zip = valueFromId("zip");
+    let zip = valueFromId("zipcode");
     let lat = valueFromId("lat");
     let lng = valueFromId("lng");
-    let tags = getTagsFromForm("tags");
+    let tags = getTags("tags");
 
     if (!validLocationName(name))
       errors.push(
@@ -250,18 +253,18 @@
         "Addresses must be 5-200 chars and contain valid address chars only.",
       );
     if (!validZip(zip)) errors.push("Zipcode must be 5 digits.");
-    if (validLat(lat))
+    if (!validLat(lat))
       errors.push("Latitude must be a valid number between -90 and 90.");
-    if (validLng(lng))
+    if (!validLng(lng))
       errors.push("Longitude must be a valid number between -180 and 180.");
     validateTags(tags, errors, "Location tags");
     validImgs("locPics", errors, "Location pictures", 5);
 
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
   $("#reviewForm").on("submit", function (event) {
@@ -273,7 +276,7 @@
       errors.push("Review content must be 1-1000 chars.");
     }
     if (
-      !isOnlyDigits(safetyRating) ||
+      !onlyDigits(safetyRating) ||
       Number(safetyRating) < 1 ||
       Number(safetyRating) > 5
     )
@@ -282,9 +285,9 @@
     validImgs("reviewPics", errors, "Review pictures", 5);
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
   $("#profileForm").on("submit", function (event) {
@@ -312,7 +315,7 @@
     if (!validEmail(email)) errors.push("Email must be a valid email.");
 
     if (newPw || confirmPw) {
-      if (!currentPassword)
+      if (!currPw)
         errors.push(
           "Current password must be provided to change your password.",
         );
@@ -327,9 +330,9 @@
 
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
   $("#addFriendForm").on("submit", function (event) {
@@ -342,47 +345,213 @@
       );
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
   $("#publicListForm").on("submit", function (event) {
     let errors = [];
     let name = valueFromId("listName");
-    let tags = getTagsFromForm("listTags");
+    let tags = getTags("listTags");
 
-    if (!listName || onlyDigits(name) || name.length < 1 || name.length > 100)
-      errors.push("List name must be 1-100 chars and cannot be only digits.");
+    if (!name || onlyDigits(name) || name.length < 1 || name.length > 100)
+      errors.push(
+        "List name must between 1 and 100 chars and cannot be only digits.",
+      );
 
     validateTags(tags, errors, "List tags");
 
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
   $("#editPublicListForm").on("submit", function (event) {
     let errors = [];
     let name = valueFromId("listName");
 
-    if (!listName || onlyDigits(name) || name.length < 1 || name.length > 100)
-      errors.push("List name must be 1-100 chars and cannot be only digits.");
+    if (!name || onlyDigits(name) || name.length < 1 || name.length > 100)
+      errors.push(
+        "List name must between 1 and 100 chars and cannot be only digits.",
+      );
 
     if (errors.length > 0) {
       event.preventDefault();
-      showErrors(errors);
+      displayErrors(errors);
     } else {
-      $("#errors").empty;
+      $("#errors").empty();
     }
   });
-  $(".commentForm").on("submit", function (event) {});
-  $(".reportForm").on("submit", function (event) {});
-  $(".addLocationToListForm").on("submit", function (event) {});
-  $(".deleteLocationFromListForm", ".delete-form").on(
-    "submit",
-    function (event) {},
-  );
+  $(".commentForm").on("submit", function (event) {
+    let errors = [];
+    let comment = $(this).find('textarea[name="commentText"]').val().trim();
+    if (!comment || comment.length > 500)
+      errors.push("Comment must between 1 and 500 chars.");
+
+    if (errors.length > 0) {
+      event.preventDefault();
+      displayErrors(errors);
+    } else {
+      $("#errors").empty();
+    }
+  });
+  $(".reportForm").on("submit", function (event) {
+    let errors = [];
+    let type = $(this).find('input[name="type"]').val();
+    let id = $(this).find('input[name="item_id"]').val();
+    let content = $(this).find('textarea[name="content"]').val().trim();
+
+    if (!["location", "review", "comment"].includes(type))
+      errors.push("Report type is invalid.");
+
+    if (!id || !validObjID(id)) errors.push("Reported item is invalid.");
+    if (!content || content.length > 500) {
+      errors.push("Report content must between 1 and 500 chars.");
+    }
+
+    if (errors.length > 0) {
+      event.preventDefault();
+      displayErrors(errors);
+    } else {
+      $("#errors").empty();
+    }
+  });
+  $(".addLocationToListForm").on("submit", function (event) {
+    let errors = [];
+    let id = $(this).find('select[name="locationId"]').val();
+    if (!id || !validObjID(id))
+      errors.push("Please select a valid location to add to the list.");
+
+    if (errors.length > 0) {
+      event.preventDefault();
+      displayErrors(errors);
+    } else {
+      $("#errors").empty();
+    }
+  });
+  function bindEventsToLocationItem(location) {
+    location.find(".likeLocation").on("click", function (event) {
+      event.preventDefault();
+      let currId = String($(this).data("id"));
+      if (!currId || !validObjID(currId)) {
+        displayErrors(["Invalid location id."]);
+        return;
+      }
+      const reqConfig = {
+        method: "POST",
+        url: "/location/" + currId + "/like",
+      };
+      $.ajax(reqConfig).then(
+        function (responseMessage) {
+          if (!responseMessage.success) {
+            displayErrors([
+              responseMessage.error || "Unable to like this location.",
+            ]);
+            return;
+          }
+          location.find(".locationLikes").text(responseMessage.likes);
+          location.find(".locationDislikes").text(responseMessage.dislikes);
+          $("#errors").empty();
+        },
+        function () {
+          displayErrors(["Unable to like this location."]);
+        },
+      );
+    });
+    location.find(".dislikeLocation").on("click", function (event) {
+      event.preventDefault();
+      let currId = String($(this).data("id"));
+      if (!currId || !validObjID(currId)) {
+        displayErrors(["Invalid location id."]);
+        return;
+      }
+      const reqConfig = {
+        method: "POST",
+        url: "/location/" + currId + "/dislike",
+      };
+      $.ajax(reqConfig).then(
+        function (responseMessage) {
+          if (!responseMessage.success) {
+            displayErrors([
+              responseMessage.error || "Unable to dislike this location.",
+            ]);
+            return;
+          }
+          location.find(".locationLikes").text(responseMessage.likes);
+          location.find(".locationDislikes").text(responseMessage.dislikes);
+          $("#errors").empty();
+        },
+        function () {
+          displayErrors(["Unable to dislike this location."]);
+        },
+      );
+    });
+  }
+  $(".locationReactions").each(function (index, element) {
+    bindEventsToLocationItem($(element));
+  });
+  function bindEventsToReviewItem(review) {
+    review.find(".likeReview").on("click", function (event) {
+      event.preventDefault();
+      let currId = String($(this).data("id"));
+      if (!currId || !validObjID(currId)) {
+        displayErrors(["Invalid review id."]);
+        return;
+      }
+      const reqConfig = {
+        method: "POST",
+        url: "/reviews/" + currId + "/like",
+      };
+      $.ajax(reqConfig).then(
+        function (responseMessage) {
+          if (!responseMessage.success) {
+            displayErrors([
+              responseMessage.error || "Unable to like this review.",
+            ]);
+            return;
+          }
+          review.find(".reviewLikes").text(responseMessage.likes);
+          review.find(".reviewDislikes").text(responseMessage.dislikes);
+          $("#errors").empty();
+        },
+        function () {
+          displayErrors(["Unable to like this review."]);
+        },
+      );
+    });
+    review.find(".dislikeReview").on("click", function (event) {
+      event.preventDefault();
+      let currId = String($(this).data("id"));
+      if (!currId || !validObjID(currId)) {
+        displayErrors(["Invalid review id."]);
+        return;
+      }
+      const reqConfig = {
+        method: "POST",
+        url: "/reviews/" + currId + "/dislike",
+      };
+      $.ajax(reqConfig).then(
+        function (responseMessage) {
+          if (!responseMessage.success) {
+            displayErrors([
+              responseMessage.error || "Unable to dislike this review.",
+            ]);
+            return;
+          }
+          review.find(".reviewLikes").text(responseMessage.likes);
+          review.find(".reviewDislikes").text(responseMessage.dislikes);
+          $("#errors").empty();
+        },
+        function () {
+          displayErrors(["Unable to dislike this review."]);
+        },
+      );
+    });
+  }
+  $(".reviewReactions").each(function (index, element) {
+    bindEventsToReviewItem($(element));
+  });
 })(window.jQuery);
