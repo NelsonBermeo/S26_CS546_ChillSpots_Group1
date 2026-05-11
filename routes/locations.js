@@ -30,8 +30,6 @@ import {
   checkLocationLikeAchievements
 } from '../data/achievements.js';
 
-import { queryFilteredLocs } from '../utils/helpers.js';
-
 const router = Router();
 
 /*
@@ -76,62 +74,54 @@ router
   .route('/')
   .get(middleware.getuser, async (req, res) => {
     try {
-      if (!req.session.member) {
-        res.status(403).redirect('..');
-        return;
+      let likes = undefined;
+      if (req.query.likes === 'true') {
+        likes = true;
+      } else if (req.query.likes === 'false') {
+        likes = false;
       }
 
-      let likes = undefined; 
-      if (req.query.likes === "true") {
-        likes = true;
-      } else if (req.query.likes === "false") {
-        likes = false;
-      } 
-      
       let friend_visited = undefined;
-      if (req.query.friend_visited === "true") {
+      if (req.query.friend_visited === 'true') {
         friend_visited = true;
-      } else if (req.query.friend_visited === "false") {
+      } else if (req.query.friend_visited === 'false') {
         friend_visited = false;
-      } 
-      
-      const zip = req.query.zip || null;
-      
-      const name = req.query.loc_name || null;
-      
-      let tags = req.query.tags || null;
-      if (tags && typeof tags === "string") {
-        tags = tags.split(",").map(t => t.trim());
       }
+
+      const zip = req.query.zip || null;
+
+      const name = req.query.loc_name || null;
+
+      let tags = req.query.tags || null;
+      if (tags && typeof tags === 'string') {
+        tags = tags.split(',').map((t) => t.trim());
+      }
+
       try {
         const locations = await getLocationByFilters(
-        req.session.member._id,
-        likes,
-        friend_visited,
-        zip,
+          req.session.member._id,
+          likes,
+          friend_visited,
+          zip,
           name,
           tags
         );
 
-        res.render('location', { 
-          title: "ChillSpots - Search Locations",
+        return res.render('location', {
+          title: 'ChillSpots - Search Locations',
           locations,
-          query: req.query.loc_name || "",
-          zip: req.query.zip || "",
-          tags : req.query.tags || "",
-          loggedIn: true,
-          isAdmin: req.session.member.role === 'admin'
+          query: req.query.loc_name || '',
+          zip: req.query.zip || '',
+          tags: req.query.tags || ''
         });
       } catch (err) {
-        res.status(400).render('location', { 
-          title: "ChillSpots - Search Locations",
+        return res.status(400).render('location', {
+          title: 'ChillSpots - Search Locations',
           error: err,
           locations: undefined,
-          query: req.query.loc_name || "",
-          zip: req.query.zip || "",
-          tags : req.query.tags || "",
-          loggedIn: true,
-          isAdmin: req.session.member.role === 'admin'
+          query: req.query.loc_name || '',
+          zip: req.query.zip || '',
+          tags: req.query.tags || ''
         });
       }
     } catch (e) {
@@ -195,9 +185,7 @@ router.get('/map', middleware.getuser, async (req, res) => {
 
     return res.render('map', {
       title: 'Location Map',
-      locations,
-      loggedIn: true,
-      isAdmin: req.session.member.role === 'admin'
+      locations
     });
   } catch (e) {
     return res.status(400).render('error', {
@@ -211,9 +199,7 @@ router.get('/map', middleware.getuser, async (req, res) => {
 router.get('/new', middleware.getuser, async (req, res) => {
   try {
     return res.render('newLocation', {
-      title: 'Add Location',
-      loggedIn: true,
-      isAdmin: req.session.member.role === 'admin'
+      title: 'Add Location'
     });
   } catch (e) {
     return res.status(400).render('error', {
