@@ -20,9 +20,10 @@ import {
   toggleLocationLike,
   toggleLocationDislike,
   getLocationByFilters,
+  allowedTags
 } from "../data/locations.js";
 
-import { addReview } from "../data/reviews.js";
+import { addReview, getReviewsByLocationId } from "../data/reviews.js";
 import * as reports from "../data/reports.js";
 import {
   checkReviewAchievements,
@@ -513,9 +514,10 @@ router.get("/:id", async (req, res) => {
     Add getReviewsByLocationId(locationId) from data/reviews.js later.
     For now, location.reviews may only contain review IDs.
     */
-
+    const reviewList = await getReviewsByLocationId(locationId);
     return res.render("location", {
       title: location.name || "Location",
+      locations: [{
       _id: location._id.toString(),
       name: location.name,
       address: location.address,
@@ -524,10 +526,11 @@ router.get("/:id", async (req, res) => {
       likes: location.likes || 0,
       dislikes: location.dislikes || 0,
       tags: location.tags || [],
-      reviews: location.reviews || [],
+      reviews: reviewList || [],
       images: location.images || location.pictures || [],
       average_safety_rating:
         location.average_safety_rating || location.average_saftey_rating || 0,
+      }]
     });
   } catch (e) {
     return res.status(400).render('error', {

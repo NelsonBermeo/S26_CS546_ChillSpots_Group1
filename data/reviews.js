@@ -12,7 +12,7 @@ const addReview = async (
     // likes,
     // dislikes,
     // date,
-    safteyRating,
+    safetyRating,
     // comments
 ) => {
     userId = checkId(userId) // Must exist, be a string, be a ObjectId, must belong to a real user 
@@ -36,9 +36,9 @@ const addReview = async (
     // pictures =  
     // Optional, must be an array, each item must be a non empty string, each item should be a valid URL or image path, max 5 pictues
 
-    safteyRating = checkNumericString(safteyRating)
-    const parseSafteyRating = Number(safteyRating)
-    check_number_range(parseSafteyRating, 1, 5)
+    safetyRating = checkNumericString(safetyRating)
+    const parseSafetyRating = Number(safetyRating)
+    check_number_range(parseSafetyRating, 1, 5)
     //Optional, must be a number between 1 and 5.
 
     if (!Array.isArray(pictures)){
@@ -57,9 +57,9 @@ const addReview = async (
         "content" : content,
         "pictures": pictures, //empty for now
         "likes" : 0,
-        "disikes" : 0,
+        "dislikes" : 0,
         "date" : new Date(), //instant date
-        "safteyRating" : parseSafteyRating,
+        "safetyRating" : parseSafetyRating,
         "comments" : []
     }
 
@@ -85,12 +85,12 @@ const addReview = async (
     const reviewsForLocation = await reviewCollection.find({ location_id: new ObjectId( location_id ) }).toArray()
     let sum = 0
     for (let review of reviewsForLocation) {
-        sum += review.safteyRating
+        sum += review.safetyRating
     }
     
     let average = reviewsForLocation.length === 0 ? 0 : sum / reviewsForLocation.length
 
-    await locationCollection.updateOne( { _id : new ObjectId( location_id ) }, { $set : { average_saftey_rating : average } } )
+    await locationCollection.updateOne( { _id : new ObjectId( location_id ) }, { $set : { average_safety_rating : average } } )
 
     return reviewId.toString()
 
@@ -114,7 +114,7 @@ const getAllReviews = async () => {
     return reviewList;
 }
 
-const updateReview = async (id, content, safteyRating) => {
+const updateReview = async (id, content, safetyRating) => {
     id = checkId(id)
     let updated_fields = {}
 
@@ -128,11 +128,11 @@ const updateReview = async (id, content, safteyRating) => {
     //     //Deal with later
     // }
 
-    if(safteyRating){
-        safteyRating = checkNumericString(safteyRating)
-        const parseSafteyRating = Number(safteyRating)
-        check_number_range(parseSafteyRating, 1, 5)
-        updated_fields.safteyRating = parseSafteyRating
+    if(safetyRating){
+        safetyRating = checkNumericString(safetyRating)
+        const parseSafetyRating = Number(safetyRating)
+        check_number_range(parseSafetyRating, 1, 5)
+        updated_fields.safetyRating = parseSafetyRating
     }
 
     if (Object.keys(updated_fields).length === 0) {
@@ -141,7 +141,7 @@ const updateReview = async (id, content, safteyRating) => {
 
     const reviewCollection = await reviews()
     let curr_rev = await reviewCollection.findOne({_id : new ObjectId(id)})
-    let curr_rev_rating = curr_rev.safteyRating
+    let curr_rev_rating = curr_rev.safetyRating
     const updateInfo = await reviewCollection.findOneAndUpdate(
         { _id : new ObjectId(id) },
         { $set : updated_fields },
@@ -152,10 +152,10 @@ const updateReview = async (id, content, safteyRating) => {
         throw "Could not update user"
     }
 
-    if(safteyRating){
-        safteyRating = checkNumericString(safteyRating)
-        const parseSafteyRating = Number(safteyRating)
-        check_number_range(parseSafteyRating, 1, 5)
+    if(safetyRating){
+        safetyRating = checkNumericString(safetyRating)
+        const parseSafetyRating = Number(safetyRating)
+        check_number_range(parseSafetyRating, 1, 5)
 
         const locationCollection = await locations()
         let rev = await getReviewById(id)
@@ -163,11 +163,11 @@ const updateReview = async (id, content, safteyRating) => {
         const reviewsForLocation = await reviewCollection.find({ location_id: new ObjectId( rev.location_id ) }).toArray()
         let sum = 0
         for (let review of reviewsForLocation) {
-            sum += review.safteyRating
+            sum += review.safetyRating
             }
         let average = reviewsForLocation.length === 0 ? 0 : sum / reviewsForLocation.length;
         
-        await locationCollection.updateOne( { _id : new ObjectId( rev.location_id ) }, { $set : { average_saftey_rating : average } } )
+        await locationCollection.updateOne( { _id : new ObjectId( rev.location_id ) }, { $set : { average_safety_rating : average } } )
     }
 
     // updateInfo._id = updateInfo._id.toString();
@@ -218,7 +218,7 @@ const removeReview = async (reviewId, userId) => {
         throw "Error could not remove review from location";
     } 
 
-    //Then I have to update the new saftey rating 
+    //Then I have to update the new safety rating 
 
     return {
         reviewId: reviewId,
@@ -249,7 +249,7 @@ const toggleReviewLike = async (reviewId, userId) => {
         if (dislikedBy.includes(userId)) {
             await reviewCollection.updateOne(
                 { _id: new ObjectId(reviewId) },
-                { $pull: { dislikedBy: userId }, $inc: { disikes: -1 } }
+                { $pull: { dislikedBy: userId }, $inc: { dislikes: -1 } }
             );
         }
         await reviewCollection.updateOne(
@@ -261,7 +261,7 @@ const toggleReviewLike = async (reviewId, userId) => {
     const updated = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
     return {
         likes: updated.likes || 0,
-        dislikes: updated.disikes || 0,
+        dislikes: updated.dislikes || 0,
         userLiked: (updated.likedBy || []).includes(userId)
     };
 };
@@ -280,7 +280,7 @@ const toggleReviewDislike = async (reviewId, userId) => {
     if (dislikedBy.includes(userId)) {
         await reviewCollection.updateOne(
             { _id: new ObjectId(reviewId) },
-            { $pull: { dislikedBy: userId }, $inc: { disikes: -1 } }
+            { $pull: { dislikedBy: userId }, $inc: { dislikes: -1 } }
         );
     } else {
         if (likedBy.includes(userId)) {
@@ -291,16 +291,30 @@ const toggleReviewDislike = async (reviewId, userId) => {
         }
         await reviewCollection.updateOne(
             { _id: new ObjectId(reviewId) },
-            { $push: { dislikedBy: userId }, $inc: { disikes: 1 } }
+            { $push: { dislikedBy: userId }, $inc: { dislikes: 1 } }
         );
     }
 
     const updated = await reviewCollection.findOne({ _id: new ObjectId(reviewId) });
     return {
         likes: updated.likes || 0,
-        dislikes: updated.disikes || 0,
+        dislikes: updated.dislikes || 0,
         userDisliked: (updated.dislikedBy || []).includes(userId)
     };
 };
+const getReviewsByLocationId = async(locationId) => {
+    locationId = checkId(locationId, "locationId")
+    const reviewCollection = await reviews()
 
-export {removeReview, updateReview, getAllReviews, getReviewById, addReview, toggleReviewLike, toggleReviewDislike}
+    const reviewList = await reviewCollection.find({location_id: new ObjectId(locationId)}).toArray();
+    return reviewList.map((review) => ({
+        ...review,
+        _id: review._id.toString(),
+        user_id: review.user_id?.toString(),
+        location_id: review.location_id?.toString(),
+        dislikes: review.dislikes || 0,
+        safetyRating: review.safetyRating
+    }))
+}
+
+export {removeReview, updateReview, getAllReviews, getReviewById, addReview, toggleReviewLike, toggleReviewDislike, getReviewsByLocationId}

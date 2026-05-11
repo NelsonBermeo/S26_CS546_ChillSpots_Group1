@@ -11,8 +11,8 @@
         <p>Coordinates: {{coordinates.lat}}, {{coordinates.lng}}</p>
         {{/if}}
 
-        {{#if images.length}}
-        {{#each images}}
+        {{#if pictures.length}}
+        {{#each pictures}}
         <img src="{{this}}" class="locationImage" alt="Picture of {{../name}}" />
         {{/each}}
         {{else}}

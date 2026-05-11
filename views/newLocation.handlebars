@@ -33,7 +33,7 @@
         <label for="tags">Tags:</label>
         <input type="text" id="tags" name="tags" list="tagsForNewLoc" />
         <datalist id="tagsForNewLoc">
-            {{#each allowedTags}}
+            {{#each tags}}
             <option value="{{this}}"></option>
             {{/each}}
         </datalist>
