@@ -5,6 +5,7 @@ import { middleware } from "../middleware/auth.js";
 import * as reports from "../data/reports.js";
 import { toggleReviewLike, toggleReviewDislike } from "../data/reviews.js";
 import { checkReviewLikeAchievements } from "../data/achievements.js";
+import {addComment} from "../data/comments.js"
 
 const router = Router();
 
@@ -96,16 +97,10 @@ router.post("/:id/comments", middleware.getuser, async (req, res) => {
 
     check_length(commentContent, 1, 1000);
 
-    return notImplementedRender(
-      res,
-      "Requires comment creation implementation in data/comments.js or data/reviews.js.",
-    );
-
-    /*
     await addComment(reviewId, userId, commentContent);
 
     return res.redirect(req.get('Referrer') || '/');
-    */
+    
   } catch (e) {
     return res.status(400).render("error", {
       title: "Comment Error",

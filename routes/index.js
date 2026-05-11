@@ -4,6 +4,7 @@ import locationRoutes from "./locations.js";
 import reviewRoutes from "./reviews.js";
 import userRoutes from "./users.js"
 import publicListsRoutes from "./publicLists.js";
+import commentRoutes from "./comments.js";
 
 const constructorMethod = (app) => {
     app.use('/', authRoutes);
@@ -12,6 +13,8 @@ const constructorMethod = (app) => {
     app.use('/reviews', reviewRoutes);
     app.use('/user', userRoutes);
     app.use('/publiclists', publicListsRoutes);
+    app.use('/comments', commentRoutes);
+
 
     app.use((req, res) => {
         res.status(404).render("error", {
