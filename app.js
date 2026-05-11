@@ -23,6 +23,13 @@ app.use(
   }),
 );
 
+app.use((req, res, next) => {
+  res.locals.loggedIn = Boolean(req.session.member);
+  res.locals.isAdmin = req.session.member?.role === "admin";
+  res.locals.currentUser = req.session.member || null;
+  return next();
+});
+
 app.use("/", middleware.logger);
 app.use("/register", middleware.getregister);
 app.use("/login", middleware.getlogin);
