@@ -2,7 +2,8 @@
 <div class="page-content">
 <main class="location card">
     {{> search}}
-    {{#each locations}}
+    {{#each locations}} 
+    <div class="location-sect">
         <h1>{{name}}</h1>
         <p class="locAddress">{{address}}</p>
         <p>ZIP Code: {{zipcode}}</p>
@@ -88,6 +89,7 @@
             <p>There are currently no reviews for this location.</p>
             {{/if}}
         </section>
+    </div>
     {{/each}}
 </main>
 </div>

@@ -144,7 +144,7 @@ const addUser = async (
     if (profile_picture === undefined || profile_picture === null || profile_picture.trim() === "" ){
         profile_picture = DEFAULT_PROFILE_PICTURE
     } else {
-        profile_picture = profile_picture.trim()
+        profile_picture = profile_picture.trim();
     }
 
     // if (profile_picture.startsWith("public/uploads/"))

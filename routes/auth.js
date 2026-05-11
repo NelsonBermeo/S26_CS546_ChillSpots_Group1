@@ -39,13 +39,13 @@ router
             res.render('register');
         } catch (e) {
             return res.status(500).render('error', {
-                title: "Error", 
-                error : e,
-                loggedIn: Boolean(req.session.member),
-                isAdmin: (Boolean(req.session.member)) ? 
-                    req.session.member.role === 'admin' :
-                    undefined
-            });
+            title: "Error", 
+            error : e,
+            loggedIn: Boolean(req.session.member),
+            isAdmin: (Boolean(req.session.member)) ? 
+                req.session.member.role === 'admin' :
+                undefined
+        });
         }
     })
     .post(upload.single('profilePic'), async (req, res) => {
