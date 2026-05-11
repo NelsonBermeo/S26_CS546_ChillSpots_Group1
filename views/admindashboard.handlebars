@@ -15,14 +15,13 @@
       <p><strong>Report:</strong> {{content}}</p>
       <p><strong>Reporter Email:</strong> {{reporter}}</p>
       <button onclick="reportDeletionHandler('{{id}}')">Delete {{type}}</button>
-      <form class="delete-form" method="POST" action="/admin/reports/{{id}}/delete">
-        <button type="submit">Delete {{type}}</button>
-      </form>
+      <button onclick="reportIgnoreHandler('{{id}}')">Ignore</button>
     </li>
     {{/each}}
   </ul>
   {{else}}
   <p>No reports to review.</p>
   {{/if}}
+  <script src="../public/js/admin.js"></script>
 </div>
 {{> footer}}

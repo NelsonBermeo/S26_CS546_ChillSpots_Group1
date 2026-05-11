@@ -44,7 +44,7 @@
         <form class="visitedForm" method="POST" action="/location/{{_id}}/visited">
             <button type="submit">Mark As Visited</button>
         </form>
-        <form class="reportForm" method="POST" action="/reports">
+        <form class="reportForm" method="POST" action="/location/{{_id}}/reports">
             <input type="hidden" name="type" value="location">
             <input type="hidden" name="item_id" value="{{_id}}">
 
