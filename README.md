@@ -110,3 +110,11 @@ Run:
 
 ```bash
 npm install
+
+## Group Members
+
+- Christopher Bernard
+- Jamil Torres
+- Nelson Bermeo
+- Ryan Johnson
+- Sahil Virani
