@@ -141,8 +141,8 @@ const addLocation = async (
     }
     
 
-    let lat = Number(coordinates.lng)
-    let long = Number(coordinates.lng)
+    let lat = Number(coordinates.lat)
+    let lng = Number(coordinates.lng)
 
     check_number_range(coordinates.lat, -90, 90)
     check_number_range(coordinates.lng, -180, 180)
