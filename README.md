@@ -45,24 +45,14 @@ The goal of ChillSpots is to make it easier for people to find enjoyable, low-st
   - Public lists scaffolding
   - Visited locations tracking scaffolding
 
----
-
-# Planned Features
-
 - **Comment System**
   - Nested comments and discussions on reviews
 
 - **Friend System**
   - Add friends and view shared activity
 
-- **Notifications**
-  - Alerts for interactions, reports, and friend activity
-
 - **Achievements**
   - User milestones and badges
-
-- **Nearby Restaurant Integration**
-  - Nearby food and activity recommendations
 
 - **Admin Dashboard**
   - Review moderation and report management
@@ -110,3 +100,12 @@ Run:
 
 ```bash
 npm install
+```
+
+## Group Members
+
+- Christopher Bernard
+- Jamil Torres
+- Nelson Bermeo
+- Ryan Johnson
+- Sahil Virani
