@@ -237,6 +237,7 @@ export {
   addLocationToList,
   removeLocationFromList,
   removeList,
-  getLocationsNotInList
+  getLocationsNotInList,
+  VALID_TAGS
 };
 

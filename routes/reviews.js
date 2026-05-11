@@ -1,10 +1,10 @@
-import {Router} from 'express';
-import xss from 'xss';
-import {checkId, checkString, check_length} from '../validation.js';
-import {middleware} from '../middleware/auth.js';
-import * as reports from '../data/reports.js';
-import {toggleReviewLike, toggleReviewDislike} from '../data/reviews.js';
-import {checkReviewLikeAchievements} from '../data/achievements.js';
+import { Router } from "express";
+import xss from "xss";
+import { checkId, checkString, check_length } from "../validation.js";
+import { middleware } from "../middleware/auth.js";
+import * as reports from "../data/reports.js";
+import { toggleReviewLike, toggleReviewDislike } from "../data/reviews.js";
+import { checkReviewLikeAchievements } from "../data/achievements.js";
 
 const router = Router();
 
@@ -21,81 +21,84 @@ TODO:
 
 //checks whether the request expects a JSON response instead of a rendered page
 const wantsJson = (req) => {
-  const accept = req.get('accept') || '';
-  return req.xhr || accept.includes('application/json');
+  const accept = req.get("accept") || "";
+  return req.xhr || accept.includes("application/json");
 };
 
 //returns a temporary JSON error response for unfinished AJAX/API functionality
 const notImplementedJson = (res, todo) => {
   return res.status(501).json({
     success: false,
-    error: todo
+    error: todo,
   });
 };
 
 //renders a temporary "Not Implemented" error page for unfinished form/page functionality
 const notImplementedRender = (res, todo) => {
-  return res.status(501).render('error', {
-    title: 'Not Implemented',
-    error: todo
+  return res.status(501).render("error", {
+    title: "Not Implemented",
+    error: todo,
   });
 };
 
 //adds a like reaction to a review
-router.post('/:id/like', middleware.getuser, async (req, res) => {
+router.post("/:id/like", middleware.getuser, async (req, res) => {
   try {
-    const reviewId = checkId(req.params.id, 'reviewId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const reviewId = checkId(req.params.id, "reviewId");
+    const userId = checkId(req.session.member._id, "userId");
 
-    await toggleReviewLike(reviewId, userId);
+    let updatedReview = await toggleReviewLike(reviewId, userId);
 
-    try {
-      await checkReviewLikeAchievements(reviewId);
-    } catch (e) {
-    }
-
-    return res.redirect(req.get('Referrer') || '/');
+    return res.json({
+      success: true,
+      likes: updatedReview.likes,
+      dislikes: updatedReview.dislikes,
+    });
   } catch (e) {
-    return res.status(400).render('error', {
-      title: 'Review Like Error',
-      error: e.toString()
+    return res.status(400).json({
+      success: false,
+      error: e.toString(),
     });
   }
 });
 
 //adds a dislike reaction to a review
-router.post('/:id/dislike', middleware.getuser, async (req, res) => {
+router.post("/:id/dislike", middleware.getuser, async (req, res) => {
   try {
-    const reviewId = checkId(req.params.id, 'reviewId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const reviewId = checkId(req.params.id, "reviewId");
+    const userId = checkId(req.session.member._id, "userId");
 
-    await toggleReviewDislike(reviewId, userId);
+    let updatedReview = await toggleReviewDislike(reviewId, userId);
 
-    return res.redirect(req.get('Referrer') || '/');
+    return res.json({
+      success: true,
+      likes: updatedReview.likes,
+      dislikes: updatedReview.dislikes,
+    });
   } catch (e) {
-    return res.status(400).render('error', {
-      title: 'Review Dislike Error',
-      error: e.toString()
+    return res.status(400).json({
+      success: false,
+      error: e.toString(),
     });
   }
 });
 
 //adds a comment to a review
-router.post('/:id/comments', middleware.getuser, async (req, res) => {
+router.post("/:id/comments", middleware.getuser, async (req, res) => {
   try {
-    const reviewId = checkId(req.params.id, 'reviewId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const reviewId = checkId(req.params.id, "reviewId");
+    const userId = checkId(req.session.member._id, "userId");
 
     const commentContent = checkString(
       xss(req.body.commentText || req.body.content),
-      'comment'
+      "comment",
     );
 
     check_length(commentContent, 1, 1000);
 
     return notImplementedRender(
       res,
-      'Requires comment creation implementation in data/comments.js or data/reviews.js.'
+      "Requires comment creation implementation in data/comments.js or data/reviews.js.",
     );
 
     /*
@@ -104,37 +107,37 @@ router.post('/:id/comments', middleware.getuser, async (req, res) => {
     return res.redirect(req.get('Referrer') || '/');
     */
   } catch (e) {
-    return res.status(400).render('error', {
-      title: 'Comment Error',
-      error: e.toString()
+    return res.status(400).render("error", {
+      title: "Comment Error",
+      error: e.toString(),
     });
   }
 });
 
 //submits a report against a review for moderation/admin review
-router.post('/:id/reports', middleware.getuser, async (req, res) => {
+router.post("/:id/reports", middleware.getuser, async (req, res) => {
   try {
-    const reviewId = checkId(req.params.id, 'reviewId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const reviewId = checkId(req.params.id, "reviewId");
+    const userId = checkId(req.session.member._id, "userId");
 
     const rawReason = req.body.reason || req.body.content;
-    const reason = checkString(xss(rawReason), 'reason');
+    const reason = checkString(xss(rawReason), "reason");
     check_length(reason, 5, 500);
 
-    await reports.addReport(userId, reviewId, 'review', reason);
+    await reports.addReport(userId, reviewId, "review", reason);
 
-    return res.redirect(req.get('Referrer') || '/');
+    return res.redirect(req.get("Referrer") || "/");
   } catch (e) {
     if (wantsJson(req)) {
       return res.status(400).json({
         success: false,
-        error: e.toString()
+        error: e.toString(),
       });
     }
 
-    return res.status(400).render('error', {
-      title: 'Report Error',
-      error: e.toString()
+    return res.status(400).render("error", {
+      title: "Report Error",
+      error: e.toString(),
     });
   }
 });

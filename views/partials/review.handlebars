@@ -10,9 +10,8 @@
     <form method="POST" action="/reviews/{{_id}}/like">
       <button type="submit">Like</button>
     </form>
-    <form method="POST" action="/reviews/{{_id}}/dislike">
-      <button type="submit">Dislike</button>
-    </form>
+    <a href="/reviews/{{_id}}/like" class="likeReview" data-id="{{_id}}">Like</a>
+    <a href="/reviews/{{_id}}/dislike" class="dislikeReview" data-id="{{_id}}">Dislike</a>
   </div>
 
   <p class="reviewContent">{{content}}</p>

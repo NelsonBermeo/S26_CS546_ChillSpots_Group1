@@ -320,7 +320,7 @@ const userVisited = async (id, locationId) => {
     const userCollection = await users();
     let updateInfo = await userCollection.findOneAndUpdate(
     { _id : new ObjectId(id) },
-    { $push : locationId.toString() },
+    { $push : { visited_locations_list: locationId.toString() } },
     { returnDocument : "after" }
     )
     return updateInfo
@@ -356,4 +356,4 @@ const addFriend = async (userId, friendId) => {
     return updateInfo
 }
 
-export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited}
+export {updateUser, removeUser, getUserByEmail, checkUser, addUser, getUserById, getAllUsers, userVisited, addFriend}

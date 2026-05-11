@@ -1,13 +1,13 @@
-import {Router} from 'express';
-import xss from 'xss';
+import { Router } from "express";
+import xss from "xss";
 import {
   checkId,
   checkString,
   checkStringArray,
   checkNumericString,
-  check_length
-} from '../validation.js';
-import {middleware} from '../middleware/auth.js';
+  check_length,
+} from "../validation.js";
+import { middleware } from "../middleware/auth.js";
 
 import {
   addLocation,
@@ -19,18 +19,16 @@ import {
   getLocationsByZip,
   toggleLocationLike,
   toggleLocationDislike,
-  getLocationByFilters
-} from '../data/locations.js';
+  getLocationByFilters,
+} from "../data/locations.js";
 
-import {addReview} from '../data/reviews.js';
-import * as reports from '../data/reports.js';
+import { addReview } from "../data/reviews.js";
+import * as reports from "../data/reports.js";
 import {
   checkReviewAchievements,
   checkLocationAchievements,
-  checkLocationLikeAchievements
-} from '../data/achievements.js';
-
-import { queryFilteredLocs } from '../utils/helpers.js';
+  checkLocationLikeAchievements,
+} from "../data/achievements.js";
 
 const router = Router();
 
@@ -50,9 +48,9 @@ TODO:
 
 //renders a temporary "Not Implemented" error page for unfinished route functionality
 const notImplemented = (res, todo) => {
-  return res.status(501).render('error', {
-    title: 'Not Implemented',
-    error: todo
+  return res.status(501).render("error", {
+    title: "Not Implemented",
+    error: todo,
   });
 };
 
@@ -63,67 +61,61 @@ const parseTags = (rawTags) => {
   let tags = rawTags;
 
   if (!Array.isArray(tags)) {
-    tags = tags.split(',').map((tag) => tag.trim());
+    tags = tags.split(",").map((tag) => tag.trim());
   }
 
   tags = tags.map((tag) => xss(tag).toLowerCase());
 
-  return checkStringArray(tags, 'tags');
+  return checkStringArray(tags, "tags");
 };
 
 //renders the main locations browse/search page
 router
-  .route('/')
+  .route("/")
   .get(middleware.getuser, async (req, res) => {
     try {
-      if (!req.session.member) {
-        res.status(403).redirect('..');
-        return;
-      }
-
-      let likes = undefined; 
+      let likes = undefined;
       if (req.query.likes === "true") {
         likes = true;
       } else if (req.query.likes === "false") {
         likes = false;
-      } 
-      
+      }
+
       let friend_visited = undefined;
       if (req.query.friend_visited === "true") {
         friend_visited = true;
       } else if (req.query.friend_visited === "false") {
         friend_visited = false;
-      } 
-      
+      }
+
       const zip = req.query.zip || null;
-      
+
       const name = req.query.loc_name || null;
-      
+
       let tags = req.query.tags || null;
       if (tags && typeof tags === "string") {
-        tags = tags.split(",").map(t => t.trim());
+        tags = tags.split(",").map((t) => t.trim());
       }
+
       try {
         const locations = await getLocationByFilters(
-        req.session.member._id,
-        likes,
-        friend_visited,
-        zip,
+          req.session.member._id,
+          likes,
+          friend_visited,
+          zip,
           name,
-          tags
+          tags,
         );
 
-        res.render('location', { 
+        return res.render("location", {
           title: "ChillSpots - Search Locations",
           locations,
           query: req.query.loc_name || "",
           zip: req.query.zip || "",
-          tags : req.query.tags || "",
-          loggedIn: true,
-          isAdmin: req.session.member.role === 'admin'
+          tags: req.query.tags || "",
         });
       } catch (err) {
-        res.status(400).render('location', { 
+        return res.status(400).render("location", {
           title: "ChillSpots - Search Locations",
           error: err,
           locations: undefined,
@@ -151,20 +143,20 @@ router
   //creates a new user-submitted location
   .post(middleware.getuser, async (req, res) => {
     try {
-      const userId = checkId(req.session.member._id, 'userId');
+      const userId = checkId(req.session.member._id, "userId");
 
-      const name = checkString(xss(req.body.name), 'name');
+      const name = checkString(xss(req.body.name), "name");
       check_length(name, 1, 100);
 
-      const address = checkString(xss(req.body.address), 'address');
+      const address = checkString(xss(req.body.address), "address");
       check_length(address, 5, 200);
 
-      const zipcode = checkNumericString(xss(req.body.zipcode), 'zipcode');
+      const zipcode = checkNumericString(xss(req.body.zipcode), "zipcode");
       check_length(zipcode, 5, 5);
 
       const coordinates = {
         lat: req.body.lat,
-        lng: req.body.lng
+        lng: req.body.lng,
       };
 
       const pictures = [];
@@ -177,13 +169,12 @@ router
         zipcode,
         coordinates,
         pictures,
-        tags
+        tags,
       );
 
       try {
         await checkLocationAchievements(userId);
-      } catch (e) {
-      }
+      } catch (e) {}
 
       return res.redirect(`/location/${locationId}`);
     } catch (e) {
@@ -199,15 +190,13 @@ router
   });
 
 //renders the map page for locations
-router.get('/map', middleware.getuser, async (req, res) => {
+router.get("/map", middleware.getuser, async (req, res) => {
   try {
     const locations = await getAllLocations();
 
-    return res.render('map', {
-      title: 'Location Map',
+    return res.render("map", {
+      title: "Location Map",
       locations,
-      loggedIn: true,
-      isAdmin: req.session.member.role === 'admin'
     });
   } catch (e) {
     return res.status(400).render('error', {
@@ -222,12 +211,10 @@ router.get('/map', middleware.getuser, async (req, res) => {
 });
 
 //renders the form for creating a new location
-router.get('/new', middleware.getuser, async (req, res) => {
+router.get("/new", middleware.getuser, async (req, res) => {
   try {
-    return res.render('newLocation', {
-      title: 'Add Location',
-      loggedIn: true,
-      isAdmin: req.session.member.role === 'admin'
+    return res.render("newLocation", {
+      title: "Add Location",
     });
   } catch (e) {
     return res.status(400).render('error', {
@@ -242,15 +229,15 @@ router.get('/new', middleware.getuser, async (req, res) => {
 });
 
 //returns location search results as JSON for AJAX/client-side search
-router.get('/api/search', middleware.getuser, async (req, res) => {
+router.get("/api/search", middleware.getuser, async (req, res) => {
   try {
     let locations = [];
 
     if (req.query.name) {
-      const name = checkString(xss(req.query.name), 'name');
+      const name = checkString(xss(req.query.name), "name");
       locations = await getLocationsByName(name);
     } else if (req.query.zipcode) {
-      const zipcode = checkNumericString(xss(req.query.zipcode), 'zipcode');
+      const zipcode = checkNumericString(xss(req.query.zipcode), "zipcode");
       locations = await getLocationsByZip(zipcode);
     } else if (req.query.tags) {
       const tags = parseTags(req.query.tags);
@@ -261,18 +248,18 @@ router.get('/api/search', middleware.getuser, async (req, res) => {
 
     return res.json({
       success: true,
-      locations
+      locations,
     });
   } catch (e) {
     return res.status(400).json({
       success: false,
-      error: e.toString()
+      error: e.toString(),
     });
   }
 });
 
 //returns location marker data as JSON for the map
-router.get('/api/map', middleware.getuser, async (req, res) => {
+router.get("/api/map", middleware.getuser, async (req, res) => {
   try {
     const locations = await getAllLocations();
 
@@ -284,35 +271,38 @@ router.get('/api/map', middleware.getuser, async (req, res) => {
       coordinates: location.coordinates,
       tags: location.tags,
       average_safety_rating:
-        location.average_safety_rating || location.average_saftey_rating || 0
+        location.average_safety_rating || location.average_saftey_rating || 0,
     }));
 
     return res.json({
       success: true,
-      locations: markers
+      locations: markers,
     });
   } catch (e) {
     return res.status(400).json({
       success: false,
-      error: e.toString()
+      error: e.toString(),
     });
   }
 });
 
 //toggles like on a location for the logged-in user
-router.post('/:id/like', middleware.getuser, async (req, res) => {
+router.post("/:id/like", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const locationId = checkId(req.params.id, "locationId");
+    const userId = checkId(req.session.member._id, "userId");
 
-    await toggleLocationLike(locationId, userId);
+    let updatedLocation = await toggleLocationLike(locationId, userId);
 
     try {
       await checkLocationLikeAchievements(locationId);
-    } catch (e) {
-    }
+    } catch (e) {}
 
-    return res.redirect(req.get('Referrer') || `/location/${locationId}`);
+    return res.json({
+      success: true,
+      likes: updatedLocation.likes,
+      dislikes: updatedLocation.dislikes,
+    });
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Location Like Error',
@@ -326,14 +316,18 @@ router.post('/:id/like', middleware.getuser, async (req, res) => {
 });
 
 //toggles dislike on a location for the logged-in user
-router.post('/:id/dislike', middleware.getuser, async (req, res) => {
+router.post("/:id/dislike", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const locationId = checkId(req.params.id, "locationId");
+    const userId = checkId(req.session.member._id, "userId");
 
-    await toggleLocationDislike(locationId, userId);
+    let updatedLocation = await toggleLocationDislike(locationId, userId);
 
-    return res.redirect(req.get('Referrer') || `/location/${locationId}`);
+    return res.json({
+      success: true,
+      likes: updatedLocation.likes,
+      dislikes: updatedLocation.dislikes,
+    });
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Location Dislike Error',
@@ -347,13 +341,13 @@ router.post('/:id/dislike', middleware.getuser, async (req, res) => {
 });
 
 //renders the edit form for a location
-router.get('/:id/edit', middleware.getuser, async (req, res) => {
+router.get("/:id/edit", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
+    const locationId = checkId(req.params.id, "locationId");
 
     return notImplemented(
       res,
-      'Requires views/editLocation.handlebars before this route can render an edit form.'
+      "Requires views/editLocation.handlebars before this route can render an edit form.",
     );
 
     /*
@@ -377,9 +371,9 @@ router.get('/:id/edit', middleware.getuser, async (req, res) => {
 });
 
 //updates editable fields for a location
-router.post('/:id/edit', middleware.getuser, async (req, res) => {
+router.post("/:id/edit", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
+    const locationId = checkId(req.params.id, "locationId");
     const tags = parseTags(req.body.tags);
 
     await updateLocation(locationId, tags);
@@ -398,13 +392,13 @@ router.post('/:id/edit', middleware.getuser, async (req, res) => {
 });
 
 //deletes a location if the current user is authorized
-router.post('/:id/delete', middleware.getuser, async (req, res) => {
+router.post("/:id/delete", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
+    const locationId = checkId(req.params.id, "locationId");
 
     return notImplemented(
       res,
-      'Requires verified removeLocation(locationId, userId) implementation and owner/admin authorization.'
+      "Requires verified removeLocation(locationId, userId) implementation and owner/admin authorization.",
     );
   } catch (e) {
     return res.status(400).render('error', {
@@ -419,17 +413,17 @@ router.post('/:id/delete', middleware.getuser, async (req, res) => {
 });
 
 //creates a review for a specific location
-router.post('/:id/reviews', middleware.getuser, async (req, res) => {
+router.post("/:id/reviews", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const locationId = checkId(req.params.id, "locationId");
+    const userId = checkId(req.session.member._id, "userId");
 
-    const content = checkString(xss(req.body.content), 'content');
+    const content = checkString(xss(req.body.content), "content");
     check_length(content, 1, 1000);
 
     const safetyRating = checkNumericString(
       xss(req.body.safetyRating),
-      'safetyRating'
+      "safetyRating",
     );
 
     const pictures = [];
@@ -444,8 +438,7 @@ router.post('/:id/reviews', middleware.getuser, async (req, res) => {
 
     try {
       await checkReviewAchievements(userId);
-    } catch (e) {
-    }
+    } catch (e) {}
 
     return res.redirect(`/location/${locationId}`);
   } catch (e) {
@@ -461,14 +454,14 @@ router.post('/:id/reviews', middleware.getuser, async (req, res) => {
 });
 
 //marks a specific location as visited for the logged-in user
-router.post('/:id/visited', middleware.getuser, async (req, res) => {
+router.post("/:id/visited", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const locationId = checkId(req.params.id, "locationId");
+    const userId = checkId(req.session.member._id, "userId");
 
     return notImplemented(
       res,
-      'Requires markLocationVisited(userId, locationId) implementation in data/users.js or data/locations.js.'
+      "Requires markLocationVisited(userId, locationId) implementation in data/users.js or data/locations.js.",
     );
   } catch (e) {
     return res.status(400).render('error', {
@@ -483,18 +476,18 @@ router.post('/:id/visited', middleware.getuser, async (req, res) => {
 });
 
 //reports a location for moderation/admin review
-router.post('/:id/reports', middleware.getuser, async (req, res) => {
+router.post("/:id/reports", middleware.getuser, async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
-    const userId = checkId(req.session.member._id, 'userId');
+    const locationId = checkId(req.params.id, "locationId");
+    const userId = checkId(req.session.member._id, "userId");
 
     const rawContent = req.body.content || req.body.reason;
-    const content = checkString(xss(rawContent), 'content');
+    const content = checkString(xss(rawContent), "content");
     check_length(content, 5, 500);
 
-    await reports.addReport(userId, locationId, 'location', content);
+    await reports.addReport(userId, locationId, "location", content);
 
-    return res.redirect(req.get('Referrer') || `/location/${locationId}`);
+    return res.redirect(req.get("Referrer") || `/location/${locationId}`);
   } catch (e) {
     return res.status(400).render('error', {
       title: 'Report Location Error',
@@ -508,9 +501,9 @@ router.post('/:id/reports', middleware.getuser, async (req, res) => {
 });
 
 //renders one location detail page by id using the current location.handlebars top-level field structure
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const locationId = checkId(req.params.id, 'locationId');
+    const locationId = checkId(req.params.id, "locationId");
     const location = await getLocationById(locationId);
 
     /*
@@ -519,8 +512,8 @@ router.get('/:id', async (req, res) => {
     For now, location.reviews may only contain review IDs.
     */
 
-    return res.render('location', {
-      title: location.name || 'Location',
+    return res.render("location", {
+      title: location.name || "Location",
       _id: location._id.toString(),
       name: location.name,
       address: location.address,
@@ -532,7 +525,7 @@ router.get('/:id', async (req, res) => {
       reviews: location.reviews || [],
       images: location.images || location.pictures || [],
       average_safety_rating:
-        location.average_safety_rating || location.average_saftey_rating || 0
+        location.average_safety_rating || location.average_saftey_rating || 0,
     });
   } catch (e) {
     return res.status(400).render('error', {
