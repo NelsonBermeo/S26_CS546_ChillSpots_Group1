@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
 import { checkId, checkString, checkNumericString, check_chars_1, check_chars_2, check_length, check_number_range} from "../validation.js"
 import {removeReview, updateReview, getAllReviews, getReviewById, addReview} from '../data/reviews.js'
-import {users, locations} from '../config/mongoCollections.js';
+import {users, locations, reviews} from '../config/mongoCollections.js';
 
 
 const allowedTags = [
@@ -278,7 +278,7 @@ const removeLocation = async (locationId) => {
     if (location.reviews.length !== 0){
         for (let review of location.reviews){
             let rev = await getReviewById(review)
-            await removeReview(review, rev.userId)
+            await removeReview(review, rev.user_id.toString())
         }
     }
     await userCollection.updateMany({},{ $pull: { added_locations_list: locationId } })

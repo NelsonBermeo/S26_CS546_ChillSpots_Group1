@@ -79,5 +79,21 @@ export const middleware = {
             return;
         }
         next(); 
-    }
+    },
+    getlocation : (req, res, next) => {
+        const isAuthenticated = Boolean(req.session.member);
+        if (!isAuthenticated) {
+            res.redirect('/login');
+            return;
+        }
+        next(); 
+    },
+    getreviews : (req, res, next) => {
+        const isAuthenticated = Boolean(req.session.member);
+        if (!isAuthenticated) {
+            res.redirect('/login');
+            return;
+        }
+        next(); 
+    },
 }

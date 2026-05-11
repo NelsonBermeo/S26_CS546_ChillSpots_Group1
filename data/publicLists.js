@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { publicLists, users, locations } from '../config/mongoCollections.js';
 import { checkId, checkString, checkStringArray, check_length } from '../validation.js';
 
-const VALID_TAGS = [
+export const VALID_TAGS = [
   'park','pier','lake','river','beach','quiet', 'calm', 'scenic',
   'view','sunset','nature','walk','hike','trail', 'grass', 'trees',
   'garden','picnic','study','date','friends','family','food',
