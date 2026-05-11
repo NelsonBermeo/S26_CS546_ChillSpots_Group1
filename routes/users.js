@@ -3,6 +3,7 @@ import xss from 'xss';
 import {checkId, checkString, check_length} from '../validation.js';
 import {middleware} from '../middleware/auth.js';
 import {getUserById} from '../data/users.js';
+import { getLocationById } from '../data/locations.js';
 
 const router = Router();
 
@@ -54,6 +55,16 @@ router.get('/profile', middleware.getuser, async (req, res) => {
       email: user.email
     };
 
+    let visited_locations = [];
+    for (let loc of user.visited_locations_list) {
+      visited_locations.push(
+        {
+          id: loc,
+          loc_name: (await getLocationById(loc)).name
+        }
+      )
+    }
+
     return res.render('profile', {
       title: 'My Profile',
       user,
@@ -64,7 +75,7 @@ router.get('/profile', middleware.getuser, async (req, res) => {
       profilePic: user.profile_picture,
       reviews: user.reviews || [],
       friends: user.friends_list || [],
-      visited: user.visited_locations_list || [],
+      visited: visited_locations || [],
       lists: user.public_lists || [],
       achievements: user.achievements || [],
       loggedIn: true,
