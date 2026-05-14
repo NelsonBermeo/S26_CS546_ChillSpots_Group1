@@ -1,4 +1,4 @@
-# CS 546: ChillSpots
+# ChillSpots
 
 ***Discover your next local chill.***
 
